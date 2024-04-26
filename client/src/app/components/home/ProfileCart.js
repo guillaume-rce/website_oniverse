@@ -4,7 +4,7 @@ import profileImage from '../../../res/icon/manage_accounts.svg';
 import logoutImage from '../../../res/icon/logout.svg';
 
 function ProfileCart() {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
     const [userName, setUserName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -14,7 +14,10 @@ function ProfileCart() {
                 .then(response => response.json())
                 .then(data => {
                     const pseudo = data.pseudo;
-                    if (pseudo.length > 15) {
+                    console.log(pseudo);
+                    if (!pseudo) {
+                        setUserName('unknown');
+                    } else if (pseudo.length > 15) {
                         setUserName(pseudo.substring(0, 12) + '... °-°');
                     } else {
                         setUserName(pseudo);

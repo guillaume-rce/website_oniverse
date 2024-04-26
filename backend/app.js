@@ -86,8 +86,6 @@ app.get('/games/', (req, res, next) => {
     });
 });
 
-
-
 app.get('/images/', (req, res, next) => {
     content.query('SELECT * FROM images', (error, results) => {
         if (error) {
@@ -199,12 +197,59 @@ app.post('/login/', (req, res, next) => {
     });
 });
 
-// Upload profile image
-app.post('/user/uploadProfileImage', upload.single('image'), async (req, res) => {
+app.post('/user/pseudo', (req, res, next) => {
+    const userId = req.headers.userid;
+    const token = req.headers.token;
+    const pseudo = req.body.pseudo;
+
+    jwt.verify(token, 'RANDOM_TOKEN_SECRET', (err, decodedToken) => {
+        if (err || decodedToken.userId !== parseInt(userId)) {
+            return res.status(401).json({ error: 'Requête non autorisée.' });
+        }
+
+        const query = 'UPDATE users SET pseudo = ? WHERE id = ?';
+        internal.query(query, [pseudo, userId], (error) => {
+            if (error) {
+                console.error('Erreur lors de la mise à jour du pseudo :', error);
+                res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du pseudo.' });
+            } else {
+                res.status(200).json({ message: 'Pseudo mis à jour avec succès.' });
+            }
+        });
+    });
+});
+
+app.post('/user/bio', (req, res, next) => {
+    const userId = req.headers.userid;
+    const token = req.headers.token;
+    const bio = req.body.bio;
+
+    jwt.verify(token, 'RANDOM_TOKEN_SECRET', (err, decodedToken) => {
+        if (err || decodedToken.userId !== parseInt(userId)) {
+            return res.status(401).json({ error: 'Requête non autorisée.' });
+        }
+
+        const query = 'UPDATE users SET bio = ? WHERE id = ?';
+        internal.query(query, [bio, userId], (error) => {
+            if (error) {
+                console.error('Erreur lors de la mise à jour de la bio :', error);
+                res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de la bio.' });
+            } else {
+                res.status(200).json({ message: 'Bio mise à jour avec succès.' });
+            }
+        });
+    });
+});
+
+app.post('/user/image/:type', upload.single('image'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Aucun fichier téléchargé.' });
     }
 
+    const type = req.params.type;
+    if (type !== 'profile' && type !== 'banner') {
+        return res.status(400).json({ error: 'Type de fichier non pris en charge.' });
+    }
     const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
     const userId = req.headers.userid;
     const token = req.headers.token;
@@ -213,8 +258,11 @@ app.post('/user/uploadProfileImage', upload.single('image'), async (req, res) =>
         if (err || decodedToken.userId !== parseInt(userId)) {
             return res.status(401).json({ error: 'Requête non autorisée.' });
         }
+        // TODO: Ajouter une suppression de l'ancienne image
 
-        const query = 'UPDATE users SET image = ? WHERE id = ?';
+        const profileImageQuery = 'UPDATE users SET image = ? WHERE id = ?';
+        const bannerImageQuery = 'UPDATE users SET banner = ? WHERE id = ?';
+        const query = type === 'profile' ? profileImageQuery : bannerImageQuery;
         internal.query(query, [imageUrl, userId], (error) => {
             if (error) {
                 console.error('Erreur lors de la mise à jour de l\'image de profil :', error);

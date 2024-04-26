@@ -56,8 +56,12 @@ function Profile() {
         }
     }, [url]);
 
-    function uploadProfileImage(file) {
-        const url = `http://localhost:3001/user/uploadProfileImage`;
+    function uploadProfileImage(file, type) {
+        if (type !== 'profile' && type !== 'banner') {
+            console.error('Type de fichier non pris en charge');
+            return;
+        }
+        const url = `http://localhost:3001/user/image/${type}`;
         const formData = new FormData();
         formData.append('image', file);
 
@@ -65,7 +69,7 @@ function Profile() {
             method: 'POST',
             headers: {
                 userId,
-                token: localStorage.getItem('token')
+                token: localStorage.getItem('token') || sessionStorage.getItem('token')
             },
             body: formData
         })
