@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Calque_1"
+   data-name="Calque 1"
+   viewBox="0 0 1920 1080"
+   version="1.1"
+   sodipodi:docname="logo_1920_1080_nobg.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview36"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.5962963"
+     inkscape:cx="960.09317"
+     inkscape:cy="540"
+     inkscape:window-width="1920"
+     inkscape:window-height="1005"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Calque_1" />
+  <defs
+     id="defs11">
+    <style
+       id="style2">
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: url(#Dégradé_sans_nom_66);
+      }
+    </style>
+    <linearGradient
+       id="Dégradé_sans_nom_66"
+       data-name="Dégradé sans nom 66"
+       x1="43.14"
+       y1="1060.28"
+       x2="1769.17"
+       y2="80.83"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#ffd921"
+         id="stop4" />
+      <stop
+         offset=".45"
+         stop-color="#ffbf1b"
+         id="stop6" />
+      <stop
+         offset="1"
+         stop-color="#ffa415"
+         id="stop8" />
+    </linearGradient>
+  </defs>
+  <rect
+     class="cls-1"
+     x="178"
+     y="263"
+     width="1563"
+     height="555"
+     rx="51"
+     ry="51"
+     id="rect15" />
+  <g
+     id="g33">
+    <path
+       class="cls-2"
+       d="M486.48,538.4c0,77.49-46.72,118.57-103.72,118.57s-100.41-46.09-100.41-114.23c0-71.48,44.07-118.24,103.72-118.24s100.41,47.09,100.41,113.89Zm-173.31,3.67c0,48.1,25.85,91.18,71.25,91.18s71.58-42.42,71.58-93.52c0-44.76-23.2-91.52-71.25-91.52s-71.58,44.42-71.58,93.85Z"
+       id="path17" />
+    <path
+       class="cls-2"
+       d="M523.92,653.29v-225.12h31.48l71.58,113.89c16.57,26.39,29.49,50.1,40.1,73.15l.66-.33c-2.65-30.06-3.31-57.45-3.31-92.52v-94.19h27.17v225.12h-29.16l-70.91-114.23c-15.57-25.05-30.49-50.77-41.75-75.15l-.99,.33c1.66,28.39,2.32,55.44,2.32,92.85v96.19h-27.17Z"
+       id="path19" />
+    <path
+       class="cls-2"
+       d="M770.79,428.18v225.12h-28.83v-225.12h28.83Z"
+       id="path21" />
+    <path
+       class="cls-2"
+       d="M870.2,653.29l-72.9-225.12h31.15l34.79,110.89c9.61,30.39,17.89,57.78,23.86,84.17h.66c6.3-26.05,15.57-54.44,25.52-83.83l37.78-111.22h30.82l-79.86,225.12h-31.81Z"
+       id="path23" />
+    <path
+       class="cls-2"
+       d="M1121.71,547.75h-86.82v81.16h96.76v24.38h-125.59v-225.12h120.62v24.38h-91.79v71.14h86.82v24.05Z"
+       id="path25" />
+    <path
+       class="cls-2"
+       d="M1169.09,431.18c14.58-3.01,35.46-4.68,55.34-4.68,30.82,0,50.7,5.68,64.62,18.37,11.27,10.02,17.56,25.38,17.56,42.75,0,29.73-18.56,49.43-42.08,57.45v1c17.23,6.01,27.5,22.04,32.81,45.42,7.29,31.4,12.59,53.11,17.23,61.79h-29.82c-3.64-6.35-8.62-25.72-14.91-53.77-6.63-31.06-18.56-42.75-44.74-43.75h-27.17v97.53h-28.83v-222.11Zm28.83,102.54h29.49c30.82,0,50.37-17.03,50.37-42.75,0-29.06-20.88-41.75-51.36-42.08-13.92,0-23.86,1.34-28.5,2.67v82.16Z"
+       id="path27" />
+    <path
+       class="cls-2"
+       d="M1343.39,617.89c12.92,8.02,31.81,14.7,51.69,14.7,29.49,0,46.72-15.7,46.72-38.41,0-21.04-11.93-33.07-42.08-44.76-36.45-13.03-58.99-32.06-58.99-63.79,0-35.07,28.83-61.12,72.24-61.12,22.87,0,39.43,5.34,49.38,11.02l-7.95,23.71c-7.29-4.01-22.2-10.69-42.42-10.69-30.49,0-42.08,18.37-42.08,33.73,0,21.04,13.59,31.4,44.4,43.42,37.78,14.7,57,33.07,57,66.13,0,34.74-25.52,64.8-78.21,64.8-21.54,0-45.07-6.35-57-14.36l7.29-24.38Z"
+       id="path29" />
+    <path
+       class="cls-2"
+       d="M1626.38,547.75h-86.82v81.16h96.76v24.38h-125.59v-225.12h120.62v24.38h-91.79v71.14h86.82v24.05Z"
+       id="path31" />
+  </g>
+</svg>

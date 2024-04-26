@@ -1,0 +1,26 @@
+.AllGames {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.AllGames_title {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.AllGames_container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    gap: 20px;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

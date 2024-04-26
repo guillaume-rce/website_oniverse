@@ -1,0 +1,47 @@
+.not-found_container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.not-found_title {
+    font-size: 50px;
+    font-weight: bold;
+    color: #333;
+}
+
+.not-found_subtitle {
+    font-size: 20px;
+    color: #666;
+}
+
+.not-found_text {
+    font-size: 15px;
+    color: #888;
+}
+
+.not-found_button {
+    height: 50px;
+    width: 150px;
+    background: linear-gradient(70deg, #ffd821, #ffa415);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.not-found_button:hover {
+    transform: scale(1.1);
+}
+
+.not-found_dino {
+    margin-top: 50px;
+    font-size: 15px;
+    color: #666;
+}
+
