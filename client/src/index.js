@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import Home from './app/Pages/Home';
 import Detail from './app/Pages/Detail';
-import Login from './app/Pages/Login';
-import Register from './app/Pages/Register';
+import Auth from './app/Pages/Auth';
 import Profile from './app/Pages/Profile';
 import QuatreCentQuatre from './app/Pages/NotFound';
 
@@ -18,8 +17,7 @@ root.render(
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/detail/:idGame" component={Detail} />
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/register" component={Register} />
+        <Route exact path="/auth" component={Auth} />
         <Route exact path="/profile" component={Profile} />
         <Route component={QuatreCentQuatre} />
       </Switch>

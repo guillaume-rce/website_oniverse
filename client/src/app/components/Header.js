@@ -65,7 +65,7 @@ function Header(props) {
             </button>
             <div className='header_profile'>
                 <img src={profileImage || defaultProfileImage} alt="Profile" className='header_profile_img'
-                    onClick={() => userId ? toggleProfile() : window.location.href = '/login'} />
+                    onClick={() => userId ? toggleProfile() : window.location.href = '/auth'} />
             </div>
             {isProfileVisible && <ProfileCart />}
             {isCartVisible && <ShippingCart />}

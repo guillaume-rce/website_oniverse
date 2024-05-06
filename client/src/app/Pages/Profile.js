@@ -25,16 +25,12 @@ function Profile() {
     const [overBanner, setOverBanner] = useState(false);
     const [overProfile, setOverProfile] = useState(false);
 
-    function isTokenExpired(token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.exp * 1000 < Date.now();
-    }
 
     // Récupérer les informations de l'utilisateur
     const url = `http://localhost:3001/user/${userId}`;
     useEffect(() => {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        if (token && !isTokenExpired(token)) {
+        if (token) {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {

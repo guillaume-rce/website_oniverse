@@ -33,6 +33,8 @@ function ProfileCart() {
     function logout() {
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('token');
         window.location.href = '/';
     }
 
