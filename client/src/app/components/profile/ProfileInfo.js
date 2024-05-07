@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import modify from '../../../res/icon/modify.svg';
 import defaultProfileImage from '../../../res/default/profile.jpg';
+import admin from '../../../res/icon/admin.png';
 import { useDropzone } from 'react-dropzone';
 
 import './ProfileInfo.css';
 
-function ProfileInfo({ profileImage, username, creationDate, onFileReady }) {
+function ProfileInfo({ profileImage, username, creationDate, role, onFileReady }) {
     const inputRef = useRef(null);
 
     const [overProfile, setOverProfile] = useState(false);
@@ -47,11 +48,14 @@ function ProfileInfo({ profileImage, username, creationDate, onFileReady }) {
             });
     }
 
+    console.log(role);
+
     return (
         <div className="profile_main">
             <div alt="Profile" className="profile_image" style={{ backgroundImage: `url(${imageUrl})` }}
                 onMouseEnter={() => setOverProfile(true)} onMouseLeave={() => setOverProfile(false)} {...getRootProps()}>
-
+                {role === 1 && <img src={admin} alt="Admin" className="profile_admin" />}
+                
                 <input {...getInputProps()} />
                 {overProfile && <div className="profile_change" style={{ borderRadius: '50%' }} >
                     <img src={modify} alt="Change profile" className="profile_change_img" />

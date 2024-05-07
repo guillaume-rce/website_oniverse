@@ -5,6 +5,7 @@ import Home from './app/Pages/Home';
 import Detail from './app/Pages/Detail';
 import Auth from './app/Pages/Auth';
 import Profile from './app/Pages/Profile';
+import ShoppingCart from './app/Pages/ShoppingCart';
 import QuatreCentQuatre from './app/Pages/NotFound';
 
 import reportWebVitals from './reportWebVitals';
@@ -19,6 +20,7 @@ root.render(
         <Route exact path="/detail/:idGame" component={Detail} />
         <Route exact path="/auth" component={Auth} />
         <Route exact path="/profile" component={Profile} />
+        <Route exact path="/shopping-cart" component={ShoppingCart} />
         <Route component={QuatreCentQuatre} />
       </Switch>
     </Router>

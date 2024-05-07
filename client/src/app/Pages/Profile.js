@@ -17,6 +17,7 @@ function Profile() {
     const [bannerImage, setBannerImage] = useState('');
     const [creationDate, setCreationDate] = useState('');
     const [bio, setBio] = useState('Pas de bio ?\nPas de problème... Vous êtes mystérieux ! 😎');
+    const [role, setRole] = useState(0); // 0: utilisateur, 1: administrateur
     const [games, setGames] = useState([]);
     const [achievements, setAchievements] = useState([]);
 
@@ -39,6 +40,8 @@ function Profile() {
                     setProfileImage(data.image);
                     setBannerImage(data.banner);
                     data.bio && setBio(data.bio);
+                    console.log(data.role);
+                    setRole(data.role);
                     setCreationDate(data.registrationDateTime);
                 })
                 .catch(error => {
@@ -98,7 +101,8 @@ function Profile() {
             <Banner bannerImage={bannerImage} onFileReady={uploadProfileImage} />
 
             <ProfileInfo profileImage={profileImage} username={username}
-                creationDate={creationDate} onFileReady={uploadProfileImage} />
+                creationDate={creationDate} role={role}
+                onFileReady={uploadProfileImage} />
 
             <div className="profile_info_main_container">
                 <div className="profile_info_container">

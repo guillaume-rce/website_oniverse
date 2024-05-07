@@ -23,7 +23,7 @@ function Banner({ bannerImage, onFileReady }) {
             onMouseEnter={() => setOverBanner(true)} onMouseLeave={() => setOverBanner(false)} {...getRootProps()}>
             
             <input {...getInputProps()} />
-            {overBanner && <div className="profile_change">
+            {overBanner && <div className="profile_banner_change">
                 <img src={modify} alt="Change banner" className="profile_change_img" />
             </div>}
         </div>

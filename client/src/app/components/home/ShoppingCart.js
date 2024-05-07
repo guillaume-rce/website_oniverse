@@ -7,7 +7,7 @@ function ShoppingCart() {
     const { cart, removeFromCart } = useCart();
 
     // Calcul du total du panier arrondi à 2 décimales
-    const totalPrice = cart.reduce((acc, game) => acc + game.price*game.quantity, 0).toFixed(2);
+    const totalPrice = cart.reduce((acc, game) => acc + game.price * game.quantity, 0).toFixed(2);
 
     return (
         <div className="shopping-cart">
@@ -32,10 +32,11 @@ function ShoppingCart() {
                             />
                         </li>
                     ))}
-            </ul>
+                </ul>
             }
             <p className="shopping-cart-total">Total : {totalPrice}€</p>
-            <button className="shopping-cart-view-cart">Votre panier</button>
+            <button className="shopping-cart-view-cart"
+                onClick={() => window.location.href = '/shopping-cart'}>Voir le panier</button>
         </div>
     );
 }

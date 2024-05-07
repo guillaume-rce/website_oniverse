@@ -70,7 +70,8 @@
     outline: none;
 }
 
-.shopping-cart-list-item-rm::before, .shopping-cart-list-item-rm::after {
+.shopping-cart-list-item-rm::before,
+.shopping-cart-list-item-rm::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -88,7 +89,8 @@
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-.shopping-cart-list-item-rm:hover::before, .shopping-cart-list-item-rm:hover::after {
+.shopping-cart-list-item-rm:hover::before,
+.shopping-cart-list-item-rm:hover::after {
     transform: translate(-50%, -50%) rotate(0deg);
     transition: transform 0.3s ease;
 }

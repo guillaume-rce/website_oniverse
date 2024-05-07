@@ -42,6 +42,11 @@ export const CartProvider = ({ children }) => {
         });
     };
 
+    const removeAllFromCart = (gameTitle) => {
+        // Remove all instances of the game from the cart
+        setCart((currentCart) => currentCart.filter((game) => game.name !== gameTitle));
+    }
+
     /*
     The cart looks like this:
     [
@@ -53,6 +58,7 @@ export const CartProvider = ({ children }) => {
         cart,
         addToCart,
         removeFromCart,
+        removeAllFromCart,
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

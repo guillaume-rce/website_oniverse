@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import './ProfileCart.css';
 import profileImage from '../../../res/icon/manage_accounts.svg';
 import logoutImage from '../../../res/icon/logout.svg';
+import tunesImage from '../../../res/icon/tunes.svg';
 
 function ProfileCart() {
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
     const [userName, setUserName] = useState('');
+    const [role, setRole] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
@@ -22,6 +24,7 @@ function ProfileCart() {
                     } else {
                         setUserName(pseudo);
                     }
+                    setRole(data.role);
                 })
                 .catch(error => {
                     console.error('Erreur lors de la récupération des informations de l\'utilisateur :', error);
@@ -45,6 +48,10 @@ function ProfileCart() {
                 <img src={profileImage} alt="Profile" className="profile_button_img" />
                 <text className="profile_button_text">Profile</text>
             </div>
+            {role === 1 && <div className="profile_button" onClick={() => window.location.href = '/admin'}>
+                <img src={tunesImage} alt="Admin" className="profile_button_img" />
+                <text className="profile_button_text">Admin</text>
+            </div>}
             <div className="profile_button" onClick={logout}>
                 <img src={logoutImage} alt="Logout" className="profile_button_img" />
                 <text className="profile_button_text">Logout</text>
