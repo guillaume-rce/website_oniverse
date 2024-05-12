@@ -2,10 +2,10 @@
 -- version 5.1.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: May 12, 2024 at 02:38 PM
--- Server version: 5.7.24
--- PHP Version: 8.0.1
+-- Hôte : localhost:3306
+-- Généré le : dim. 12 mai 2024 à 19:24
+-- Version du serveur : 5.7.24
+-- Version de PHP : 8.3.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `content`
+-- Base de données : `content`
 --
 CREATE DATABASE IF NOT EXISTS `content` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `content`;
@@ -26,7 +26,7 @@ USE `content`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `articles`
+-- Structure de la table `articles`
 --
 
 CREATE TABLE `articles` (
@@ -40,7 +40,7 @@ CREATE TABLE `articles` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `games`
+-- Structure de la table `games`
 --
 
 CREATE TABLE `games` (
@@ -54,7 +54,7 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `games`
+-- Déchargement des données de la table `games`
 --
 
 INSERT INTO `games` (`id`, `name`, `description`, `logo`, `image`, `price`, `url`) VALUES
@@ -64,7 +64,7 @@ INSERT INTO `games` (`id`, `name`, `description`, `logo`, `image`, `price`, `url
 -- --------------------------------------------------------
 
 --
--- Table structure for table `images`
+-- Structure de la table `images`
 --
 
 CREATE TABLE `images` (
@@ -75,7 +75,7 @@ CREATE TABLE `images` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `images`
+-- Déchargement des données de la table `images`
 --
 
 INSERT INTO `images` (`id`, `path`, `isLight`, `uploadDateTime`) VALUES
@@ -83,50 +83,50 @@ INSERT INTO `images` (`id`, `path`, `isLight`, `uploadDateTime`) VALUES
 (2, 'http://localhost:3001/img/EmojiQuizz.webp', 0, '2024-04-18 14:41:40');
 
 --
--- Indexes for dumped tables
+-- Index pour les tables déchargées
 --
 
 --
--- Indexes for table `articles`
+-- Index pour la table `articles`
 --
 ALTER TABLE `articles`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `games`
+-- Index pour la table `games`
 --
 ALTER TABLE `games`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `images`
+-- Index pour la table `images`
 --
 ALTER TABLE `images`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT pour les tables déchargées
 --
 
 --
--- AUTO_INCREMENT for table `articles`
+-- AUTO_INCREMENT pour la table `articles`
 --
 ALTER TABLE `articles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `games`
+-- AUTO_INCREMENT pour la table `games`
 --
 ALTER TABLE `games`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `images`
+-- AUTO_INCREMENT pour la table `images`
 --
 ALTER TABLE `images`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
--- Database: `internal_data`
+-- Base de données : `internal_data`
 --
 CREATE DATABASE IF NOT EXISTS `internal_data` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `internal_data`;
@@ -134,7 +134,7 @@ USE `internal_data`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `delivery_method`
+-- Structure de la table `delivery_method`
 --
 
 CREATE TABLE `delivery_method` (
@@ -145,7 +145,7 @@ CREATE TABLE `delivery_method` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `delivery_method`
+-- Déchargement des données de la table `delivery_method`
 --
 
 INSERT INTO `delivery_method` (`id`, `name`, `cost`, `available`) VALUES
@@ -156,7 +156,7 @@ INSERT INTO `delivery_method` (`id`, `name`, `cost`, `available`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `discount_code`
+-- Structure de la table `discount_code`
 --
 
 CREATE TABLE `discount_code` (
@@ -168,7 +168,7 @@ CREATE TABLE `discount_code` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `order`
+-- Structure de la table `order`
 --
 
 CREATE TABLE `order` (
@@ -187,18 +187,19 @@ CREATE TABLE `order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `order`
+-- Déchargement des données de la table `order`
 --
 
 INSERT INTO `order` (`id`, `user`, `name`, `country`, `zipcode`, `address`, `paymentMode`, `deliveryMethod`, `total`, `state`, `creationDateTime`, `lastUpdateDateTime`) VALUES
 (1, 1, 'John Doe', 'USA', '90210', '1234 Boulevard St.', 'CB', 1, 59, 'CONFIRMED', '2024-05-11 17:07:43', '2024-05-11 17:07:43'),
 (2, 1, 'Test', 'TestLand', '49100', '45 rue du Test', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-11 17:17:12', '2024-05-11 17:17:12'),
-(3, 1, 'TESTClear', 'jppjspojLand', '45666', '6 rue du heçhidh', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-12 13:54:59', '2024-05-12 13:54:59');
+(3, 1, 'TESTClear', 'jppjspojLand', '45666', '6 rue du heçhidh', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-12 13:54:59', '2024-05-12 13:54:59'),
+(4, 4, 'ROCHE', 'France', '49100', '15 rue beaurepaire', 'CB', 2, 29, 'CONFIRMED', '2024-05-12 17:13:43', '2024-05-12 17:13:43');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `order_item`
+-- Structure de la table `order_item`
 --
 
 CREATE TABLE `order_item` (
@@ -210,19 +211,21 @@ CREATE TABLE `order_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `order_item`
+-- Déchargement des données de la table `order_item`
 --
 
 INSERT INTO `order_item` (`id`, `order_id`, `item_id`, `quantity`, `isDigital`) VALUES
 (1, 2, 2, 2, 1),
 (2, 2, 1, 2, 1),
 (3, 3, 2, 2, 1),
-(4, 3, 1, 2, 1);
+(4, 3, 1, 2, 1),
+(5, 4, 2, 4, 1),
+(6, 4, 1, 1, 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Structure de la table `users`
 --
 
 CREATE TABLE `users` (
@@ -238,80 +241,82 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `users`
+-- Déchargement des données de la table `users`
 --
 
 INSERT INTO `users` (`id`, `pseudo`, `email`, `password`, `image`, `banner`, `bio`, `role`, `registrationDateTime`) VALUES
 (1, 'Testttt', 'test@test.com', '$2b$10$qylKni.dVwvCcaB6CpITBeBNx/NLYUSVhCRKo04360PbKUCmqqL7.', 'http://localhost:3001/img/1715018114660-image-pres.jpg', 'http://localhost:3001/img/1714120221744-windows-xp-bliss-4k-lu.jpg', NULL, 1, '2023-04-26 14:25:35'),
-(2, 'Guillaume', 'groche@fealinx.com', '$2b$10$awmMN3PSdcDiqtqTjz.vPuZIBnZYUI98N8cbZwEb/PW5hzt7beKnG', NULL, NULL, NULL, 0, '2024-05-06 19:56:42');
+(2, 'Guillaume', 'groche@fealinx.com', '$2b$10$awmMN3PSdcDiqtqTjz.vPuZIBnZYUI98N8cbZwEb/PW5hzt7beKnG', NULL, NULL, NULL, 0, '2024-05-06 19:56:42'),
+(3, 'username', 'user@example.com', '$2b$10$hfuSDRDipb6dVH1boEoZ0Onc7tD9uL97atlzOUsmDu2Ew491MWutG', NULL, NULL, NULL, 0, '2024-05-12 17:04:24'),
+(4, 'Guillaume', 'groche@outlook.fr', '$2b$10$rx8ipmuosgJlJycfXc5.XuD1SUVuvpbFHJC4svhl6Fv9CQW/ubYLi', NULL, NULL, NULL, 0, '2024-05-12 17:06:34');
 
 --
--- Indexes for dumped tables
+-- Index pour les tables déchargées
 --
 
 --
--- Indexes for table `delivery_method`
+-- Index pour la table `delivery_method`
 --
 ALTER TABLE `delivery_method`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `discount_code`
+-- Index pour la table `discount_code`
 --
 ALTER TABLE `discount_code`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `order`
+-- Index pour la table `order`
 --
 ALTER TABLE `order`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `order_item`
+-- Index pour la table `order_item`
 --
 ALTER TABLE `order_item`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `users`
+-- Index pour la table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT pour les tables déchargées
 --
 
 --
--- AUTO_INCREMENT for table `delivery_method`
+-- AUTO_INCREMENT pour la table `delivery_method`
 --
 ALTER TABLE `delivery_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `discount_code`
+-- AUTO_INCREMENT pour la table `discount_code`
 --
 ALTER TABLE `discount_code`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `order`
+-- AUTO_INCREMENT pour la table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `order_item`
---
-ALTER TABLE `order_item`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT pour la table `order_item`
+--
+ALTER TABLE `order_item`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
