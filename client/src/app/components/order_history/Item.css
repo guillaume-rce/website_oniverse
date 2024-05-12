@@ -1,0 +1,60 @@
+.order-item {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ddd; /* Light border for items */
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #fff;
+    gap: 20px;
+}
+
+.order-item img {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-item-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    /* Make it scrollable */
+    overflow-x: auto;
+    max-height: 100px;
+}
+
+.order-item-quanity {
+    font-size: 1.2em;
+}
+
+.order-item-reorder {
+    /* Align the reorder button to the right */
+    margin-left: auto;
+    /* Style the button */
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 100px;
+    width: 100px;
+
+    /* Add a smooth hover effect */
+    transition: background-color 0.3s;
+}
+
+.order-item-reorder:hover {
+    background-color: #45a049;
+}
+

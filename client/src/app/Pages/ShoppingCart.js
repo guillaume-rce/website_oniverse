@@ -11,6 +11,8 @@ const ShoppingCart = () => {
     const [deliveryMethod, setDeliveryMethod] = useState();
     const [deliveryMethods, setDeliveryMethods] = useState();
 
+    const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+
     useEffect(() => {
         fetch('http://localhost:3001/delivery')
             .then((response) => response.json())
@@ -35,7 +37,11 @@ const ShoppingCart = () => {
                 <div className="shopping-cart-details">
                     <ItemsCart />
                     <Summary deliveryMethods={deliveryMethods} deliveryMethod={deliveryMethod}
-                        setDeliveryMethod={setDeliveryMethod} setCheckout={setCheckout} setTotal={setTotal} />
+                        setDeliveryMethod={setDeliveryMethod} setCheckout={
+                            // Verify if the user is connected
+                            userId ? setCheckout : () => window.location.href = '/auth'
+                        } setTotal={setTotal} />
+
                 </div>
             ) : (
                 <Checkout deliveryMethod={deliveryMethod} total={total} setCheckout={setCheckout} />

@@ -19,7 +19,7 @@ function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = 'http://localhost:3001/' + (register ? 'signup/' : 'login/');
+      const url = 'http://localhost:3001/auth/' + (register ? 'signup/' : 'login/');
       const body = register ? { email, password, pseudo: username } : { email, password };
       const response = await fetch(url, {
         method: 'POST',

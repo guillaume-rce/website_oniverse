@@ -21,7 +21,13 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
             return;
         }
 
-        const userId = localStorage.getItem('userId');
+        // Payment method need to be selected
+        if (paymentMethod === '') {
+            setError('Please select a payment method.');
+            return;
+        }
+
+        const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
         const items = cart.map((item) => ({
             item_id: item.id,
             quantity: item.quantity,
@@ -74,8 +80,8 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
                 <label htmlFor="paymentMethod">Payment Method:</label>
                 <select id="paymentMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} required>
                     <option value="">Select Payment Method</option>
-                    <option value="paypal">Paypal</option>
-                    <option value="creditCard">Credit Card</option>
+                    <option value="PAYPAL">Paypal</option>
+                    <option value="CB">Credit Card</option>
                 </select>
 
                 <label htmlFor="zipcode">Zipcode:</label>

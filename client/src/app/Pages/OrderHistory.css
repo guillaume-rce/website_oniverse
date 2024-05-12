@@ -1,0 +1,38 @@
+/* OrderHistory component styles */
+.order-history {
+    width: 50%;
+    height: 90vh;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.orders {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    /* make it scrollable */
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+/* Loading state style */
+.loading {
+    text-align: center;
+    font-size: 1.2em;
+    color: #888;
+}
+
+/* Error message style */
+.error {
+    color: #cc0000;
+    font-size: 1em;
+    margin-top: 20px;
+    text-align: center;
+}

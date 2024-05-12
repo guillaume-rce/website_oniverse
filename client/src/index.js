@@ -7,9 +7,11 @@ import Auth from './app/Pages/Auth';
 import Profile from './app/Pages/Profile';
 import ShoppingCart from './app/Pages/ShoppingCart';
 import QuatreCentQuatre from './app/Pages/NotFound';
+import OrderHistory from './app/Pages/OrderHistory';
 
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router , Route , Switch } from 'react-router-dom/cjs/react-router-dom.min';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -21,6 +23,7 @@ root.render(
         <Route exact path="/auth" component={Auth} />
         <Route exact path="/profile" component={Profile} />
         <Route exact path="/shopping-cart" component={ShoppingCart} />
+        <Route exact path="/orders" component={OrderHistory} />
         <Route component={QuatreCentQuatre} />
       </Switch>
     </Router>
