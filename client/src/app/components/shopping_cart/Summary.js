@@ -44,10 +44,12 @@ function Summary(props) {
                 <span>Total</span>
                 <span>{(total + deliveryCharge).toFixed(2)} €</span>
             </div>
-            <button className="checkout" onClick={() => {
-                setTotal((total + deliveryCharge).toFixed(2));
-                setCheckout(true);
-            }}>Checkout</button>
+            <button className="checkout"
+                disabled={cart.length === 0 || !deliveryMethod}
+                onClick={() => {
+                    setTotal((total + deliveryCharge).toFixed(2));
+                    setCheckout(true);
+                }}>Checkout</button>
         </div>
     );
 }

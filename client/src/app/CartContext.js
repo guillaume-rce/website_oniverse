@@ -55,6 +55,10 @@ export const CartProvider = ({ children }) => {
         setCart((currentCart) => currentCart.filter((game) => game.name !== gameTitle));
     }
 
+    const clearCart = () => {
+        setCart([]);
+    }
+
     /*
     The cart looks like this:
     [
@@ -67,6 +71,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         removeAllFromCart,
+        clearCart,
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

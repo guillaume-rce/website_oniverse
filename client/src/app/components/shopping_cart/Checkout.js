@@ -4,7 +4,7 @@ import { useState } from 'react';
 import './Checkout.css';
 
 const Checkout = ({ deliveryMethod, total, setCheckout }) => {
-    const { cart } = useCart();
+    const { cart, clearCart } = useCart();
     const [name, setName] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
     const [zipcode, setZipcode] = useState('');
@@ -55,8 +55,9 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
             }
 
             const result = await response.json();
-            alert('Order successfully placed!'); // Replace with more robust UI notification
-            setCheckout(false); // Optionally close or redirect the user after successful submission
+            alert('Order successfully placed!');
+            clearCart();
+            setCheckout(false);
         } catch (error) {
             setError('Failed to place order. ' + error.message);
         }
@@ -73,7 +74,7 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
                 <label htmlFor="paymentMethod">Payment Method:</label>
                 <select id="paymentMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} required>
                     <option value="">Select Payment Method</option>
-                    <option value="paypal">PayPal</option>
+                    <option value="paypal">Paypal</option>
                     <option value="creditCard">Credit Card</option>
                 </select>
 
@@ -85,7 +86,7 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
 
                 <label htmlFor="country">Country:</label>
                 <input type="text" id="country" value={country} onChange={(e) => setCountry(e.target.value)} required />
-            
+
                 <button type="submit">Checkout</button>
                 {error && <p className="checkout-error">{error}</p>}
             </form>

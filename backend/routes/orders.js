@@ -14,108 +14,137 @@ const internal = mysql.createConnection({
 
 /**
  * @swagger
+ * tags:
+ *   - name: Orders
+ *     description: Operations related to order management.
+ *   - name: Items
+ *     description: Operations related to items within orders.
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Order:
+ *       type: object
+ *       required:
+ *         - id
+ *         - user
+ *         - name
+ *         - country
+ *         - zipcode
+ *         - address
+ *         - paymentMode
+ *         - state
+ *         - deliveryMethod
+ *         - total
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique identifier for the order.
+ *         user:
+ *           type: integer
+ *           description: The user ID associated with the order.
+ *         name:
+ *           type: string
+ *           description: The recipient's full name.
+ *         country:
+ *           type: string
+ *           description: The recipient's country.
+ *         zipcode:
+ *           type: string
+ *           description: The postal code for the delivery address.
+ *         address:
+ *           type: string
+ *           description: The delivery address.
+ *         paymentMode:
+ *           type: string
+ *           enum: [CB, PAYPAL]
+ *           description: The payment method used.
+ *         state:
+ *           type: string
+ *           enum: ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE']
+ *           description: The current state of the order.
+ *         deliveryMethod:
+ *           type: integer
+ *           description: The identifier for the delivery method used.
+ *         total:
+ *           type: number
+ *           format: float
+ *           description: The total cost of the order.
+ *     Item:
+ *       type: object
+ *       required:
+ *         - id
+ *         - order_id
+ *         - item_id
+ *         - quantity
+ *         - isDigital
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Unique identifier for the order item.
+ *         order_id:
+ *           type: integer
+ *           description: The order ID associated with this item.
+ *         item_id:
+ *           type: integer
+ *           description: The product ID of the item.
+ *         quantity:
+ *           type: integer
+ *           description: Quantity of the item ordered.
+ *         isDigital:
+ *           type: boolean
+ *           description: Indicates if the item is digital.
+ */
+
+/**
+ * @swagger
  * /orders:
  *   post:
  *     summary: Create a new order
+ *     tags: [Orders]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               user:
- *                 type: integer
- *                 example: 1
- *               name:
- *                 type: string
- *                 example: John Doe
- *               country:
- *                 type: string
- *                 example: USA
- *               zipcode:
- *                 type: string
- *                 example: 12345
- *               address:
- *                 type: string
- *                 example: 123 Main St
- *               paymentMode:
- *                 type: string
- *                 enum: [CB, PAYPAL]
- *                 example: CB
- *               state:
- *                 type: string
- *                 enum: ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE']
- *                 example: 'CONFIRMED'
- *               deliveryMethod:
- *                 type: integer
- *                 example: 2
- *               total:
- *                 type: float
- *                 example: 100.50
- *               items:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     item_id:
- *                       type: integer
- *                       example: 1
- *                     quantity:
- *                       type: integer
- *                       example: 2
- *                     isDigital:
- *                       type: boolean
- *                       example: true
+ *             $ref: '#/components/schemas/Order'
  *     responses:
  *       201:
  *         description: Order created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 orderId:
- *                   type: integer
- *                   example: 1
+ *       500:
+ *         description: Server error
  */
 router.post('/', (req, res) => {
     const { user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total, items } = req.body;
-    
     internal.beginTransaction(async (err) => {
         if (err) {
-            console.error('Erreur lors de l\'initialisation de la transaction :', err);
-            return res.status(500).json({ error: 'Erreur serveur lors de la transaction.' });
+            console.error('Error initiating transaction:', err);
+            return res.status(500).json({ error: 'Server error during transaction.' });
         }
 
         try {
-            const insertOrderQuery = `
-                INSERT INTO \`order\` (user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `;
-            const [orderResult] = await internal.promise().query(insertOrderQuery, 
-                [user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total]);
+            const insertOrderQuery = `INSERT INTO \`order\` (user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+            const [orderResult] = await internal.promise().query(insertOrderQuery, [user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total]);
             const orderId = orderResult.insertId;
 
-            const insertOrderItemQuery = `
-                INSERT INTO order_item (order_id, item_id, quantity, isDigital)
-                VALUES (?, ?, ?, ?)
-            `;
+            const insertOrderItemQuery = `INSERT INTO order_item (order_id, item_id, quantity, isDigital) VALUES (?, ?, ?, ?);`;
             for (const item of items) {
                 await internal.promise().query(insertOrderItemQuery, [orderId, item.item_id, item.quantity, item.isDigital]);
             }
 
             internal.commit((err) => {
                 if (err) {
-                    console.error('Erreur lors de la validation de la transaction :', err);
-                    return res.status(500).json({ error: 'Erreur serveur lors de la validation de la transaction.' });
+                    console.error('Error committing transaction:', err);
+                    return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(201).json({ orderId });
+                res.status(201).json({ message: 'Order created successfully', orderId: orderId });
             });
         } catch (error) {
             internal.rollback(() => {
-                console.error('Erreur lors de la mise à jour des données :', error);
-                res.status(500).json({ error: 'Erreur serveur lors de la mise à jour des données.' });
+                console.error('Error during data update:', error);
+                res.status(500).json({ error: 'Server error updating data.' });
             });
         }
     });
@@ -126,13 +155,14 @@ router.post('/', (req, res) => {
  * /orders/user/{userId}:
  *   get:
  *     summary: Retrieve a list of orders by user ID
+ *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: userId
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: The ID of the user
+ *           description: User ID to retrieve orders for.
  *     responses:
  *       200:
  *         description: A list of orders
@@ -141,54 +171,22 @@ router.post('/', (req, res) => {
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   user:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: John Doe
- *                   country:
- *                     type: string
- *                     example: USA
- *                   zipcode:
- *                     type: string
- *                     example: 12345
- *                   address:
- *                     type: string
- *                     example: 123 Main St
- *                   paymentMode:
- *                     type: string
- *                     example: CB
- *                   state:
- *                     type: string
- *                     example: CONFIRMED
- *                   deliveryMethod:
- *                     type: integer
- *                     example: 2
- *                   total:
- *                     type: float
- *                     example: 100.50
- *                   creationDateTime:
- *                     type: string
- *                     example: 2024-05-07T10:00:00Z
- *                   lastUpdateDateTime:
- *                     type: string
- *                     example: 2024-05-07T10:00:00Z
+ *                 $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: No orders found for this user
+ *       500:
+ *         description: Server error
  */
 router.get('/user/:userId', (req, res) => {
     const userId = req.params.userId;
-
-    internal.query('SELECT * FROM `order` WHERE user = ?', [userId], (error, results) => {
+    internal.query('SELECT * FROM \`order\` WHERE user = ?', [userId], (error, results) => {
         if (error) {
-            console.error('Erreur lors de la requête SELECT :', error);
-            res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
-        } else {
+            console.error('Error during the SELECT query:', error);
+            res.status(500).json({ error: 'Server error during the SELECT query.' });
+        } else if (results.length > 0) {
             res.status(200).json(results);
+        } else {
+            res.status(404).json({ error: 'No orders found for this user.' });
         }
     });
 });
@@ -198,97 +196,36 @@ router.get('/user/:userId', (req, res) => {
  * /orders/{id}:
  *   get:
  *     summary: Retrieve a single order by ID
+ *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: The ID of the order
+ *           description: Order ID to retrieve.
  *     responses:
  *       200:
- *         description: A single order
+ *         description: Detailed information about an order
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 user:
- *                   type: integer
- *                   example: 1
- *                 name:
- *                   type: string
- *                   example: John Doe
- *                 country:
- *                   type: string
- *                   example: USA
- *                 zipcode:
- *                   type: string
- *                   example: 12345
- *                 address:
- *                   type: string
- *                   example: 123 Main St
- *                 paymentMode:
- *                   type: string
- *                   example: CB
- *                 state:
- *                   type: string
- *                   example: CONFIRMED
- *                 deliveryMethod:
- *                   type: integer
- *                   example: 2
- *                 total:
- *                   type: float
- *                   example: 100.50
- *                 creationDateTime:
- *                   type: string
- *                   example: 2024-05-07T10:00:00Z
- *                 lastUpdateDateTime:
- *                   type: string
- *                   example: 2024-05-07T10:00:00Z
- *                 items:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       item_id:
- *                         type: integer
- *                         example: 1
- *                       quantity:
- *                         type: integer
- *                         example: 2
- *                       isDigital:
- *                         type: boolean
- *                         example: true
+ *               $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Order not found
+ *       500:
+ *         description: Server error
  */
 router.get('/:id', (req, res) => {
     const orderId = req.params.id;
-
-    internal.query('SELECT * FROM `order` WHERE id = ?', [orderId], (error, orderResults) => {
+    internal.query('SELECT * FROM \`order\` WHERE id = ?', [orderId], (error, results) => {
         if (error) {
-            consoleurreur('Erreur lors de la requête SELECT :', error);
-            res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
+            console.error('Error during the SELECT query:', error);
+            res.status(500).json({ error: 'Server error during the SELECT query.' });
+        } else if (results.length > 0) {
+            res.status(200).json(results[0]);
         } else {
-            if (orderResults.length > 0) {
-                internal.query('SELECT * FROM order_item WHERE order_id = ?', [orderId], (error, itemResults) => {
-                    if (error) {
-                        console.error('Erreur lors de la requête SELECT :', error);
-                        res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
-                    } else {
-                        const order = orderResults[0];
-                        order.items = itemResults;
-                        res.status(200).json(order);
-                    }
-                });
-            } else {
-                res.status(404).json({ error: 'Aucune commande trouvée avec cet ID.' });
-            }
+            res.status(404).json({ error: 'Order not found.' });
         }
     });
 });
@@ -298,13 +235,14 @@ router.get('/:id', (req, res) => {
  * /orders/{id}:
  *   delete:
  *     summary: Delete an order by ID
+ *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: The ID of the order
+ *           description: Order ID to delete.
  *     responses:
  *       200:
  *         description: Order deleted successfully
@@ -315,29 +253,69 @@ router.get('/:id', (req, res) => {
  */
 router.delete('/:id', (req, res) => {
     const orderId = req.params.id;
-
     internal.beginTransaction(async (err) => {
         if (err) {
-            console.error('Erreur lors de l\'initialisation de la transaction :', err);
-            return res.status(500).json({ error: 'Erreur serveur lors de la transaction.' });
+            console.error('Error initiating transaction:', err);
+            return res.status(500).json({ error: 'Server error during transaction.' });
         }
 
         try {
             await internal.promise().query('DELETE FROM order_item WHERE order_id = ?', [orderId]);
-            await internal.promise().query('DELETE FROM `order` WHERE id = ?', [orderId]);
+            await internal.promise().query('DELETE FROM \`order\` WHERE id = ?', [orderId]);
 
             internal.commit((err) => {
                 if (err) {
-                    console.error('Erreur lors de la validation de la transaction :', err);
-                    return res.status(500).json({ error: 'Erreur serveur lors de la validation de la transaction.' });
+                    console.error('Error committing transaction:', err);
+                    return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(200).json({ message: 'Commande supprimée avec succès.' });
+                res.status(200).json({ message: 'Order deleted successfully.' });
             });
         } catch (error) {
             internal.rollback(() => {
-                console.error('Erreur lors de la mise à jour des données :', error);
-                res.status(500).json({ error: 'Erreur serveur lors de la mise à jour des données.' });
+                console.error('Error during data update:', error);
+                res.status(500).json({ error: 'Server error updating data.' });
             });
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /orders/items/{id}:
+ *   get:
+ *     summary: Retrieve all items associated with a specific order ID
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           description: Order ID to retrieve items for.
+ *     responses:
+ *       200:
+ *         description: A list of order items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       404:
+ *         description: No items found for this order
+ *       500:
+ *         description: Server error
+ */
+router.get('/items/:id', (req, res) => {
+    const orderId = req.params.id;
+    internal.query('SELECT * FROM order_item WHERE order_id = ?', [orderId], (error, results) => {
+        if (error) {
+            console.error('Error during the SELECT query:', error);
+            res.status(500).json({ error: 'Server error during the SELECT query.' });
+        } else if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
+            res.status(404).json({ error: 'No items found for this order.' });
         }
     });
 });
