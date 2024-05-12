@@ -11,6 +11,7 @@ const imagesRoutes = require('./routes/images');
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
+const deliveryRoutes = require('./routes/delivery');
 
 app.use(cors());
 app.use('/img', express.static('img'));
@@ -23,6 +24,8 @@ app.use('/games', gamesRoutes);
 app.use('/images', imagesRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', usersRoutes);
-app.use('/order', ordersRoutes);
+
+app.use('/orders', ordersRoutes);
+app.use('/delivery', deliveryRoutes);
 
 module.exports = app;

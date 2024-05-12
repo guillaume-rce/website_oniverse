@@ -1,11 +1,10 @@
 // routes/games.js
-
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2');
 const multer = require('multer');
 
-// Configuration de la base de données
+// Database configuration
 const content = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -13,7 +12,7 @@ const content = mysql.createConnection({
     database: 'content',
 });
 
-// Configuration du stockage de fichiers
+// File storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         const uploadDir = './img';
@@ -28,9 +27,69 @@ const upload = multer({ storage: storage });
 
 /**
  * @swagger
+ * tags:
+ *   name: Games
+ *   description: Game management and retrieval
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Game:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - description
+ *         - price
+ *         - url
+ *         - logo
+ *         - image
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The game ID
+ *         name:
+ *           type: string
+ *           description: The name of the game
+ *         description:
+ *           type: string
+ *           description: The description of the game
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: The price of the game
+ *         url:
+ *           type: string
+ *           description: The URL to access the game
+ *         logo:
+ *           type: boolean
+ *           description: Flag to indicate if the game image is used as a logo
+ *         image:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: integer
+ *               description: The image ID
+ *             path:
+ *               type: string
+ *               description: The path to the image file
+ *             isLight:
+ *               type: boolean
+ *               description: Indicates if the image is a light version
+ *             uploadDateTime:
+ *               type: string
+ *               format: date-time
+ *               description: The date and time the image was uploaded
+ */
+
+/**
+ * @swagger
  * /games:
  *   get:
- *     summary: Retrieve a list of games
+ *     summary: Retrieve a list of games with their associated images
+ *     tags: [Games]
  *     responses:
  *       200:
  *         description: A list of games
@@ -39,54 +98,14 @@ const upload = multer({ storage: storage });
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     description: The game ID
- *                     example: 1
- *                   name:
- *                     type: string
- *                     description: The name of the game
- *                     example: Chess
- *                   description:
- *                     type: string
- *                     description: The description of the game
- *                     example: A classic strategy board game
- *                   image:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: The image ID
- *                         example: 1
- *                       path:
- *                         type: string
- *                         description: The path to the image
- *                         example: /img/1622483492-chess.jpg
- *                       isLight:
- *                         type: boolean
- *                         description: Indicates if the image is a light version
- *                         example: true
- *                       uploadDateTime:
- *                         type: string
- *                         format: date-time
- *                         description: The date and time the image was uploaded
- *                         example: 2024-05-07T10:00:00Z
- *                   price:
- *                     type: number
- *                     format: float
- *                     description: The price of the game
- *                     example: 19.99
- *                   url:
- *                     type: string
- *                     description: The URL to the game
- *                     example: "http://example.com/chess"
+ *                 $ref: '#/components/schemas/Game'
+ *       500:
+ *         description: Server error
  */
-router.get('/', (req, res, next) => {
+router.get('/', (req, res) => {
     const query = `
         SELECT 
-            games.id, games.name, games.description, games.price, games.url,
+            games.id, games.name, games.description, games.price, games.url, games.logo,
             images.id AS image_id, images.path AS image_path, 
             images.isLight AS image_isLight, images.uploadDateTime AS image_uploadDateTime
         FROM games
@@ -94,18 +113,19 @@ router.get('/', (req, res, next) => {
 
     content.query(query, (error, results) => {
         if (error) {
-            console.error('Erreur lors de la requête SELECT :', error);
-            res.status(500).json({ error: 'Erreur serveur requête SELECT.' });
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
         } else {
             const formattedResults = results.map(game => ({
                 id: game.id,
                 name: game.name,
                 description: game.description,
+                logo: game.logo,
                 image: {
                     id: game.image_id,
                     path: game.image_path,
-                    isLight: game.image_isLight,
-                    uploadDateTime: game.image_uploadDateTime
+                    isLight: game.isLight,
+                    uploadDateTime: game.uploadDateTime
                 },
                 price: game.price,
                 url: game.url
@@ -119,67 +139,25 @@ router.get('/', (req, res, next) => {
  * @swagger
  * /games/{id}:
  *   get:
- *     summary: Retrieve a single game by ID
+ *     summary: Retrieve a single game by ID including its image
+ *     tags: [Games]
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: The ID of the game
  *     responses:
  *       200:
  *         description: A single game
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: The game ID
- *                   example: 1
- *                 name:
- *                   type: string
- *                   description: The name of the game
- *                   example: Chess
- *                 description:
- *                   type: string
- *                   description: The description of the game
- *                   example: A classic strategy board game
- *                 image:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       description: The image ID
- *                       example: 1
- *                     path:
- *                       type: string
- *                       description: The path to the image
- *                       example: /img/1622483492-chess.jpg
- *                     isLight:
- *                       type: boolean
- *                       description: Indicates if the image is a light version
- *                       example: true
- *                     uploadDateTime:
- *                       type: string
- *                       format: date-time
- *                       description: The date and time the image was uploaded
- *                       example: 2024-05-07T10:00:00Z
- *                 price:
- *                   type: number
- *                   format: float
- *                   description: The price of the game
- *                   example: 19.99
- *                 url:
- *                   type: string
- *                   description: The URL to the game
- *                   example: "http://example.com/chess"
+ *               $ref: '#/components/schemas/Game'
  *       404:
  *         description: Game not found
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', (req, res) => {
     const gameId = req.params.id;
     const query = `
         SELECT games.*, images.id as image_id, images.path as image_path, 
@@ -190,8 +168,8 @@ router.get('/:id', (req, res, next) => {
 
     content.query(query, [gameId], (error, results) => {
         if (error) {
-            console.error('Erreur lors de la requête SELECT :', error);
-            res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
         } else {
             if (results.length > 0) {
                 const game = results[0];
@@ -199,18 +177,19 @@ router.get('/:id', (req, res, next) => {
                     id: game.id,
                     name: game.name,
                     description: game.description,
+                    logo: game.logo,
                     image: {
                         id: game.image_id,
                         path: game.image_path,
                         isLight: game.isLight,
-                        uploadDateTime: game.image_uploadDateTime
+                        uploadDateTime: game.uploadDateTime
                     },
                     price: game.price,
                     url: game.url
                 };
                 res.status(200).json(formattedResult);
             } else {
-                res.status(404).json({ error: 'Aucun jeu trouvé avec cet ID.' });
+                res.status(404).json({ error: 'No game found with this ID.' });
             }
         }
     });
@@ -220,8 +199,94 @@ router.get('/:id', (req, res, next) => {
  * @swagger
  * /games/upload:
  *   post:
- *     summary: Upload an image for a game
+ *     summary: Upload a new game with its main image
+ *     tags: [Games]
  *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the game
+ *               description:
+ *                 type: string
+ *                 description: Description of the game
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Price of the game
+ *               url:
+ *                 type: string
+ *                 description: URL to access the game
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Main image of the game
+ *               isLogo:
+ *                 type: boolean
+ *                 description: Flag to indicate if the image is also used as a logo
+ *     responses:
+ *       200:
+ *         description: Game successfully uploaded
+ *       400:
+ *         description: Validation error (e.g., no file uploaded)
+ */
+router.post('/upload', upload.single('image'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded.' });
+    }
+
+    const { name, description, price, url, isLogo } = req.body;
+    const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const logo = isLogo === 'true' ? 1 : 0;
+
+    content.beginTransaction(async (err) => {
+        if (err) {
+            console.error('Error during transaction initialization:', err);
+            return res.status(500).json({ error: 'Server error during transaction.' });
+        }
+
+        try {
+            const insertImageQuery = 'INSERT INTO images (path, isLight) VALUES (?, ?)';
+            const [imageResults] = await content.promise().query(insertImageQuery, [imageUrl, logo]);
+
+            const imageId = imageResults.insertId;
+            const insertGameQuery = 'INSERT INTO games (name, description, price, url, image, logo) VALUES (?, ?, ?, ?, ?, ?)';
+            await content.promise().query(insertGameQuery, [name, description, parseFloat(price), url, imageId, logo]);
+
+            content.commit((err) => {
+                if (err) {
+                    console.error('Error during transaction commit:', err);
+                    return res.status(500).json({ error: 'Server error during transaction commit.' });
+                }
+                res.status(200).json({ message: 'Game successfully uploaded.', imageUrl, gameId: imageId });
+            });
+        } catch (error) {
+            content.rollback(() => {
+                console.error('Error during data update:', error);
+                res.status(500).json({ error: 'Server error during data update.' });
+            });
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /games/{id}/update-image:
+ *   patch:
+ *     summary: Update the main image of a specific game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -230,72 +295,71 @@ router.get('/:id', (req, res, next) => {
  *               image:
  *                 type: string
  *                 format: binary
- *                 description: The image file
- *               gameId:
- *                 type: integer
- *                 description: The ID of the game
- *                 example: 1
- *               isLight:
- *                 type: string
- *                 enum: ["true", "false"]
- *                 description: Indicates if the image is a light version
- *                 example: "true"
+ *                 description: New main image for the game
  *     responses:
  *       200:
- *         description: Image uploaded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 imageUrl:
- *                   type: string
- *                   description: The URL of the uploaded image
- *                   example: "http://localhost:3001/img/1622483492-chess.jpg"
- *                 imageId:
- *                   type: integer
- *                   description: The ID of the uploaded image
- *                   example: 1
+ *         description: Game image updated successfully
  *       400:
- *         description: No file uploaded
+ *         description: Validation error (e.g., no file uploaded)
  */
-router.post('/upload', upload.single('image'), async (req, res) => {
+router.patch('/:id/update-image', upload.single('image'), async (req, res) => {
     if (!req.file) {
-        return res.status(400).json({ error: 'Aucun fichier téléchargé.' });
+        return res.status(400).json({ error: 'No file uploaded.' });
     }
 
-    const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
-    const gameId = req.body.gameId;
-    const isLight = req.body.isLight === 'true' ? 1 : 0;
+    const gameId = req.params.id;
+    const newImageUrl = `http://localhost:3001/img/${req.file.filename}`;
 
-    content.beginTransaction(async (err) => {
-        if (err) {
-            console.error('Erreur lors de l\'initialisation de la transaction :', err);
-            return res.status(500).json({ error: 'Erreur serveur lors de la transaction.' });
-        }
+    try {
+        const updateImageQuery = 'UPDATE images JOIN games ON games.image = images.id SET images.path = ? WHERE games.id = ?';
+        await content.promise().query(updateImageQuery, [newImageUrl, gameId]);
+        res.status(200).json({ message: 'Game image updated successfully.', newImageUrl });
+    } catch (error) {
+        console.error('Error updating game image:', error);
+        res.status(500).json({ error: 'Failed to update game image.' });
+    }
+});
 
-        try {
-            const insertImageQuery = 'INSERT INTO images (path, isLight) VALUES (?, ?)';
-            const [imageResults] = await content.promise().query(insertImageQuery, [imageUrl, isLight]);
+/**
+ * @swagger
+ * /games/{id}/update-logo:
+ *   patch:
+ *     summary: Update the logo flag of a specific game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               logo:
+ *                 type: boolean
+ *                 description: New logo flag state
+ *     responses:
+ *       200:
+ *         description: Game logo updated successfully
+ *       500:
+ *         description: Server error
+ */
+router.patch('/:id/update-logo', async (req, res) => {
+    const gameId = req.params.id;
+    const { logo } = req.body; // Assume logo is a boolean sent as 'true' or 'false'
 
-            const imageId = imageResults.insertId;
-            const updateGameQuery = 'UPDATE games SET image = ? WHERE id = ?';
-            await content.promise().query(updateGameQuery, [imageId, gameId]);
-
-            content.commit((err) => {
-                if (err) {
-                    console.error('Erreur lors de la validation de la transaction :', err);
-                    return res.status(500).json({ error: 'Erreur serveur lors de la validation de la transaction.' });
-                }
-                res.status(200).json({ imageUrl: imageUrl, imageId: imageId });
-            });
-        } catch (error) {
-            content.rollback(() => {
-                console.error('Erreur lors de la mise à jour des données :', error);
-                res.status(500).json({ error: 'Erreur serveur lors de la mise à jour des données.' });
-            });
-        }
-    });
+    try {
+        const updateLogoQuery = 'UPDATE games SET logo = ? WHERE id = ?';
+        await content.promise().query(updateLogoQuery, [logo === 'true' ? 1 : 0, gameId]);
+        res.status(200).json({ message: 'Game logo updated successfully.' });
+    } catch (error) {
+        console.error('Error updating game logo:', error);
+        res.status(500).json({ error: 'Failed to update game logo.' });
+    }
 });
 
 module.exports = router;

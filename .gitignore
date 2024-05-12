@@ -24,3 +24,4 @@ yarn-error.log*
 
 # React Component Preview
 previewConfig.json
+/client/node_modules/

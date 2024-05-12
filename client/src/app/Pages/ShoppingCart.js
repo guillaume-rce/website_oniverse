@@ -1,65 +1,46 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import './ShoppingCart.css';
+import { CartProvider } from '../CartContext';
+import ItemsCart from '../components/shopping_cart/ItemsCart';
+import Summary from '../components/shopping_cart/Summary';
+import Checkout from '../components/shopping_cart/Checkout';
 
 const ShoppingCart = () => {
+    const [checkout, setCheckout] = useState(false);
+    const [total, setTotal] = useState(0);
+    const [deliveryMethod, setDeliveryMethod] = useState();
+    const [deliveryMethods, setDeliveryMethods] = useState();
+
+    useEffect(() => {
+        fetch('http://localhost:3001/delivery')
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.length === 0) {
+                    console.error('No delivery methods found');
+                    return <div>There is an issue. Please try again later.</div>;
+                }
+
+                setDeliveryMethods(data);
+                setDeliveryMethod(data[1].id);
+            });
+    }, []);
+
+    if (!deliveryMethods) {
+        return <div>Loading...</div>;
+    }
+
     return (
-        <div className="shopping-cart">
-            <div className="cart-items">
-                <h2>Shopping Cart</h2>
-                
-                <div className="item">
-                    <img src="shirt2.jpg" alt="Shirt" />
-                    <div>
-                        <p>Shirt</p>
-                        <p>Cotton T-shirt</p>
-                    </div>
-                    <div className="quantity">
-                        <button>-</button>
-                        <input type="number" value="1" readOnly />
-                        <button>+</button>
-                    </div>
-                    <p>€ 44.00</p>
-                    <button className="remove">x</button>
+        <CartProvider>
+            {!checkout ? (
+                <div className="shopping-cart-details">
+                    <ItemsCart />
+                    <Summary deliveryMethods={deliveryMethods} deliveryMethod={deliveryMethod}
+                        setDeliveryMethod={setDeliveryMethod} setCheckout={setCheckout} setTotal={setTotal} />
                 </div>
-                <div className="item">
-                    <img src="shirt3.jpg" alt="Shirt" />
-                    <div>
-                        <p>Shirt</p>
-                        <p>Cotton T-shirt</p>
-                    </div>
-                    <div className="quantity">
-                        <button>-</button>
-                        <input type="number" value="1" readOnly />
-                        <button>+</button>
-                    </div>
-                    <p>€ 44.00</p>
-                    <button className="remove">x</button>
-                </div>
-                <a href="#">← Back to shop</a>
-            </div>
-            <div className="summary">
-                <h2>Summary</h2>
-                <div className="summary-item">
-                    <span>ITEMS 3</span>
-                    <span>€ 132.00</span>
-                </div>
-                <div className="summary-item">
-                    <span>SHIPPING</span>
-                    <select>
-                        <option>Standard-Delivery-€5.00</option>
-                    </select>
-                </div>
-                <div className="summary-item">
-                    <span>GIVE CODE</span>
-                    <input type="text" placeholder="Enter your code" />
-                </div>
-                <div className="summary-item total">
-                    <span>TOTAL PRICE</span>
-                    <span>€ 137.00</span>
-                </div>
-                <button className="register">REGISTER</button>
-            </div>
-        </div>
+            ) : (
+                <Checkout deliveryMethod={deliveryMethod} total={total} setCheckout={setCheckout} />
+            )}
+        </CartProvider>
     );
 };
 

@@ -1,0 +1,87 @@
+/* Checkout.css */
+
+.checkout-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #ffffff;
+}
+
+.checkout-title {
+    font-size: 24px;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.checkout-total {
+    font-size: 18px;
+    color: #555555;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkout-form label {
+    font-weight: bold;
+    color: #444444;
+    margin-bottom: 5px;
+}
+
+.checkout-form input[type="text"],
+.checkout-form select {
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333333;
+}
+
+.checkout-form button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.checkout-cancel {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: center;
+}
+
+.checkout-cancel:hover {
+    background-color: #e53935;
+}
+
+.checkout-error {
+    color: #f44336;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 20px;
+}

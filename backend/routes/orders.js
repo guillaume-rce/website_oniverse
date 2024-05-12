@@ -30,7 +30,7 @@ const internal = mysql.createConnection({
  *               name:
  *                 type: string
  *                 example: John Doe
- *               contry:
+ *               country:
  *                 type: string
  *                 example: USA
  *               zipcode:
@@ -43,6 +43,16 @@ const internal = mysql.createConnection({
  *                 type: string
  *                 enum: [CB, PAYPAL]
  *                 example: CB
+ *               state:
+ *                 type: string
+ *                 enum: ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE']
+ *                 example: 'CONFIRMED'
+ *               deliveryMethod:
+ *                 type: integer
+ *                 example: 2
+ *               total:
+ *                 type: float
+ *                 example: 100.50
  *               items:
  *                 type: array
  *                 items:
@@ -70,9 +80,8 @@ const internal = mysql.createConnection({
  *                   example: 1
  */
 router.post('/', (req, res) => {
-    const { user, name, contry, zipcode, address, paymentMode, items } = req.body;
-    const state = 'CONFIRMED';
-
+    const { user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total, items } = req.body;
+    
     internal.beginTransaction(async (err) => {
         if (err) {
             console.error('Erreur lors de l\'initialisation de la transaction :', err);
@@ -81,10 +90,11 @@ router.post('/', (req, res) => {
 
         try {
             const insertOrderQuery = `
-                INSERT INTO \`order\` (user, name, contry, zipcode, address, paymentMode, state)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO \`order\` (user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
-            const [orderResult] = await internal.promise().query(insertOrderQuery, [user, name, contry, zipcode, address, paymentMode, state]);
+            const [orderResult] = await internal.promise().query(insertOrderQuery, 
+                [user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total]);
             const orderId = orderResult.insertId;
 
             const insertOrderItemQuery = `
@@ -142,7 +152,7 @@ router.post('/', (req, res) => {
  *                   name:
  *                     type: string
  *                     example: John Doe
- *                   contry:
+ *                   country:
  *                     type: string
  *                     example: USA
  *                   zipcode:
@@ -157,6 +167,12 @@ router.post('/', (req, res) => {
  *                   state:
  *                     type: string
  *                     example: CONFIRMED
+ *                   deliveryMethod:
+ *                     type: integer
+ *                     example: 2
+ *                   total:
+ *                     type: float
+ *                     example: 100.50
  *                   creationDateTime:
  *                     type: string
  *                     example: 2024-05-07T10:00:00Z
@@ -168,63 +184,6 @@ router.get('/user/:userId', (req, res) => {
     const userId = req.params.userId;
 
     internal.query('SELECT * FROM `order` WHERE user = ?', [userId], (error, results) => {
-        if (error) {
-            console.error('Erreur lors de la requête SELECT :', error);
-            res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
-        } else {
-            res.status(200).json(results);
-        }
-    });
-});
-
-/**
- * @swagger
- * /orders:
- *   get:
- *     summary: Retrieve a list of orders
- *     responses:
- *       200:
- *         description: A list of orders
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   user:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: John Doe
- *                   contry:
- *                     type: string
- *                     example: USA
- *                   zipcode:
- *                     type: string
- *                     example: 12345
- *                   address:
- *                     type: string
- *                     example: 123 Main St
- *                   paymentMode:
- *                     type: string
- *                     example: CB
- *                   state:
- *                     type: string
- *                     example: CONFIRMED
- *                   creationDateTime:
- *                     type: string
- *                     example: 2024-05-07T10:00:00Z
- *                   lastUpdateDateTime:
- *                     type: string
- *                     example: 2024-05-07T10:00:00Z
- */
-router.get('/', (req, res) => {
-    internal.query('SELECT * FROM `order`', (error, results) => {
         if (error) {
             console.error('Erreur lors de la requête SELECT :', error);
             res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
@@ -263,7 +222,7 @@ router.get('/', (req, res) => {
  *                 name:
  *                   type: string
  *                   example: John Doe
- *                 contry:
+ *                 country:
  *                   type: string
  *                   example: USA
  *                 zipcode:
@@ -278,6 +237,12 @@ router.get('/', (req, res) => {
  *                 state:
  *                   type: string
  *                   example: CONFIRMED
+ *                 deliveryMethod:
+ *                   type: integer
+ *                   example: 2
+ *                 total:
+ *                   type: float
+ *                   example: 100.50
  *                 creationDateTime:
  *                   type: string
  *                   example: 2024-05-07T10:00:00Z
@@ -307,7 +272,7 @@ router.get('/:id', (req, res) => {
 
     internal.query('SELECT * FROM `order` WHERE id = ?', [orderId], (error, orderResults) => {
         if (error) {
-            console.error('Erreur lors de la requête SELECT :', error);
+            consoleurreur('Erreur lors de la requête SELECT :', error);
             res.status(500).json({ error: 'Erreur serveur lors de la requête SELECT.' });
         } else {
             if (orderResults.length > 0) {

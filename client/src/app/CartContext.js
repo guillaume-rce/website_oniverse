@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
@@ -7,7 +7,15 @@ export function useCart() {
 }
 
 export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState([]);
+    const [cart, setCart] = useState(() => {
+        const cart = localStorage.getItem('cart');
+        return cart ? JSON.parse(cart) : [];
+    });
+
+    // Save the cart to local storage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
 
     const addToCart = (game) => {
         // Add the game to the cart and increment the quantity if it's already in the cart
