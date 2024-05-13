@@ -6,6 +6,10 @@ import './OrderHistory.css';
 const OrderHistory = () => {
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
 
+    if (!userId) {
+        window.location.href = '/auth';
+    }
+
     const [orders, setOrders] = useState();
     const [error, setError] = useState('');
 
@@ -33,12 +37,17 @@ const OrderHistory = () => {
     }
 
     return (
-        <div className="order-history">
-            <h1>Order History</h1>
-            <div className="orders">
-                {orders.map((order) => (
-                    <Order key={order.id} order={order} />
-                ))}
+        <div className="order-background">
+            <button className="back-button"
+                onClick={() => window.history.back()}
+            >{"< BACK"}</button>
+            <div className="order-history">
+                <label className='orders-title'>Order History</label>
+                <div className="orders">
+                    {orders.map((order) => (
+                        <Order key={order.id} order={order} />
+                    ))}
+                </div>
             </div>
         </div>
     );

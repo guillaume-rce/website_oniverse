@@ -370,4 +370,76 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /games/{id}:
+ *   get:
+ *     summary: Retrieve a single game by ID
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the game to retrieve
+ *     responses:
+ *       200:
+ *         description: Detailed information about the game
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Game'
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id', (req, res) => {
+    const gameId = req.params.id;
+    const query = `
+        SELECT 
+            games.id, games.name, games.description, games.price, games.url,
+            mainImages.id AS image_id, mainImages.path AS image_path,
+            mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
+            logoImages.id AS logo_id, logoImages.path AS logo_path,
+            logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime
+        FROM games
+        LEFT JOIN images AS mainImages ON games.image = mainImages.id
+        LEFT JOIN images AS logoImages ON games.logo = logoImages.id
+        WHERE games.id = ?;
+    `;
+
+    content.query(query, [gameId], (error, results) => {
+        if (error) {
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: 'Game not found.' });
+        } else {
+            const game = results[0];
+            const formattedGame = {
+                id: game.id,
+                name: game.name,
+                description: game.description,
+                image: {
+                    id: game.image_id,
+                    path: game.image_path,
+                    isLight: game.isLight,
+                    uploadDateTime: game.uploadDateTime
+                },
+                logo: game.logo_id ? {
+                    id: game.logo_id,
+                    path: game.logo_path,
+                    isLight: game.logo_isLight,
+                    uploadDateTime: game.logo_uploadDateTime
+                } : null,
+                price: game.price,
+                url: game.url
+            };
+            res.status(200).json(formattedGame);
+        }
+    });
+});
+
 module.exports = router;

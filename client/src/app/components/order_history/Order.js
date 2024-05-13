@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import HorizontalTimeline from "react-horizontal-timeline";
 import Item from './Item';
+import CB from '../../../res/icon/CB.png';
+import Paypal from '../../../res/icon/paypal.png';
 import './Order.css';
 
 const Order = ({ order }) => {
@@ -10,19 +11,19 @@ const Order = ({ order }) => {
 
     useEffect(() => {
         fetch(`http://localhost:3001/orders/items/${order.id}`)
-            .then(
-                (response) => response.json(),
-                (error) => {
-                    console.error('Failed to fetch items for order', order.id, error);
-                    setError('Failed to fetch items for order');
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setItems(data);
+                } else {
+                    console.error('Expected an array, but received:', data);
+                    setItems([]);  // Set to empty array if not array
                 }
-            )
-            .then((data) => {
-                if (data.length === 0) {
-                    console.error('No items found for order', order.id);
-                    return;
-                }
-                setItems(data);
+            })
+            .catch(error => {
+                console.error('Failed to fetch items for order', order.id, error);
+                setError('Failed to fetch items for order');
+                setItems([]);  // Ensure items is always an array
             });
     }, [order.id]);
 
@@ -70,9 +71,11 @@ const Order = ({ order }) => {
         );
     };
 
-    if (items.length === 0) {
-        return <div>Loading...</div>;
+    if (!deliveryMethod || items.length === 0) {
+        return;
     }
+
+    console.log(items);
 
     const timeAgo = (dateTime) => {
         const diff = new Date() - new Date(dateTime);
@@ -104,7 +107,12 @@ const Order = ({ order }) => {
             <div className="order-header">
                 <label>Order ID: #{order.id}</label>
                 <label>Total: {order.total} €</label>
-                <label>Payment Mode: {order.paymentMode}</label>
+                <div className="payment-method">
+                    <label>Payment Mode:</label>
+                    {order.paymentMethod === 'CB' ?
+                        <img src={CB} alt="CB" className="method-icon" /> :
+                        <img src={Paypal} alt="Paypal" className="method-icon" />}
+                </div>
                 <label>Ordered {timeAgo(order.creationDateTime)}</label>
             </div>
             <div className="order-delivery">

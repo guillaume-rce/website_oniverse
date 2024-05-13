@@ -63,6 +63,7 @@ function Auth() {
       // Move auth_main to the left (left: from 50% to 0)
       for (let i = 50; i >= 0; i--) {
         setTimeout(() => {
+          console.log(i);
           document.querySelector('.auth_main').style.left = `${i}%`;
         }, (50 - i) * 3);
       }
@@ -82,6 +83,7 @@ function Auth() {
 
   return (
     <div className="login_container">
+      <button className="back_button" onClick={() => window.history.back()} >{"< BACK"}</button>
       <div alt="login background" className="login_background" style={{ backgroundImage: `url(${background})` }} />
       
       <div className="go_register_button" onClick={handleAuth}>

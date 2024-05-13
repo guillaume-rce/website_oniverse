@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import modify from '../../../res/icon/modify.svg';
 import defaultProfileImage from '../../../res/default/profile.jpg';
 import admin from '../../../res/icon/admin.png';
+import shopping from '../../../res/icon/shopping-cart.png';
 import { useDropzone } from 'react-dropzone';
 
 import './ProfileInfo.css';
@@ -57,7 +58,7 @@ function ProfileInfo({ profileImage, username, creationDate, role, onFileReady }
                 {role === 1 && <img src={admin} alt="Admin" className="profile_admin" />}
                 
                 <input {...getInputProps()} />
-                {overProfile && <div className="profile_change" style={{ borderRadius: '50%' }} >
+                {overProfile && <div className="profile_change" style={ role === 1 ? { top: '-40px' } : { top: '0' }}>
                     <img src={modify} alt="Change profile" className="profile_change_img" />
                 </div>}
             </div>

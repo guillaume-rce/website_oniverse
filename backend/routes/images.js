@@ -14,9 +14,17 @@ const content = mysql.createConnection({
 
 /**
  * @swagger
+ * tags:
+ *  name: Images
+ *  description: Gestion des images 
+ */
+
+/**
+ * @swagger
  * /images:
  *   get:
  *     summary: Retrieve a list of images
+ *     tags: [Images]
  *     responses:
  *       200:
  *         description: A list of images
@@ -61,6 +69,7 @@ router.get('/', (req, res, next) => {
  * /images/{id}:
  *   get:
  *     summary: Retrieve a single image by ID
+ *     tags: [Images]
  *     parameters:
  *       - in: path
  *         name: id

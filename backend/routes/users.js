@@ -29,9 +29,17 @@ const upload = multer({ storage: storage });
 
 /**
  * @swagger
+ *  tags:
+ *   name: Users
+ *   description: Manage users, get user information, update user information.
+ */
+
+/**
+ * @swagger
  * /user/pseudo:
  *   post:
  *     summary: Update the user's pseudo
+ *     tags: [Users]
  *     parameters:
  *       - in: header
  *         name: userid
@@ -98,6 +106,7 @@ router.post('/pseudo', (req, res, next) => {
  * /user/bio:
  *   post:
  *     summary: Update the user's bio
+ *     tags: [Users]
  *     parameters:
  *       - in: header
  *         name: userid
@@ -164,6 +173,7 @@ router.post('/bio', (req, res, next) => {
  * /user/image/{type}:
  *   post:
  *     summary: Upload an image for the user's profile or banner
+ *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: type
@@ -250,6 +260,7 @@ router.post('/image/:type', upload.single('image'), async (req, res) => {
  * /user/{id}:
  *   get:
  *     summary: Retrieve a single user by ID
+ *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: id
@@ -313,6 +324,78 @@ router.get('/:id', (req, res, next) => {
             } else {
                 res.status(404).json({ error: 'Aucun utilisateur trouvé avec cet ID.' });
             }
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /user/{id}/games:
+ *   get:
+ *     summary: Retrieve all unique games ordered by a specific user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the user to retrieve ordered games for
+ *     responses:
+ *       200:
+ *         description: List of unique games ordered by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
+ *       404:
+ *         description: No games found for this user
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id/games', (req, res) => {
+    const userId = req.params.id;
+    const query = `
+        SELECT DISTINCT games.id, games.name, games.description, games.price, games.url, 
+               mainImages.path AS image_path, mainImages.isLight AS image_isLight, 
+               mainImages.uploadDateTime AS image_uploadDateTime,
+               logoImages.path AS logo_path, logoImages.isLight AS logo_isLight, 
+               logoImages.uploadDateTime AS logo_uploadDateTime
+        FROM internal_data.order_item
+        JOIN internal_data.order ON order_item.order_id = order.id
+        JOIN content.games ON order_item.item_id = games.id
+        LEFT JOIN content.images AS mainImages ON games.image = mainImages.id
+        LEFT JOIN content.images AS logoImages ON games.logo = logoImages.id
+        WHERE order.user = ?;
+    `;
+
+    internal.query(query, [userId], (error, results) => {
+        if (error) {
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
+        } else if (results.length === 0) {
+            res.status(404).json({ error: 'No games found for this user.' });
+        } else {
+            const formattedResults = results.map(game => ({
+                id: game.id,
+                name: game.name,
+                description: game.description,
+                image: {
+                    path: game.image_path,
+                    isLight: game.image_isLight,
+                    uploadDateTime: game.image_uploadDateTime
+                },
+                logo: {
+                    path: game.logo_path,
+                    isLight: game.logo_isLight,
+                    uploadDateTime: game.logo_uploadDateTime
+                },
+                price: game.price,
+                url: game.url
+            }));
+            res.status(200).json(formattedResults);
         }
     });
 });

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import defaultProfileImage from '../../res/default/profile.jpg'
 import back from '../../res/icon/left-arrow.png';
-import modify from '../../res/icon/modify.svg';
+import shopping from '../../res/icon/shopping-cart.png';
 
 import './Profile.css';
 
 import Banner from '../components/profile/Banner';
 import ProfileInfo from '../components/profile/ProfileInfo';
+import Game from '../components/profile/Game';
 
 function Profile() {
     // vous pouvez récupérer l'ID de l'utilisateur à partir du stockage local
@@ -55,6 +55,22 @@ function Profile() {
         }
     }, [url]);
 
+    // Récupérer les jeux de l'utilisateur
+    useEffect(() => {
+        fetch(`http://localhost:3001/user/${userId}/games`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0 || data.error) {
+                    console.error('Aucun jeu trouvé pour l\'utilisateur');
+                    return;
+                }
+                setGames(data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des jeux de l\'utilisateur :', error);
+            });
+    }, [userId]);
+
     function uploadProfileImage(file, type) {
         if (type !== 'profile' && type !== 'banner') {
             console.error('Type de fichier non pris en charge');
@@ -90,6 +106,8 @@ function Profile() {
     if (!username) {
         return <div>Chargement...</div>;
     }
+
+    console.log('games', games);
 
     return (
         <div className="profile_container">
@@ -145,17 +163,19 @@ function Profile() {
                                 </div>
                                 :
                                 // Sinon, affichez les jeux de l'utilisateur
-                                <div>
+                                <div className="profile_games">
                                     {games.map(game => (
-                                        <div key={game.id} className="profile_game">
-                                            <img src={game.image} alt={game.name} className="profile_game_image" />
-                                            <text className="profile_game_name">{game.name}</text>
-                                        </div>
+                                        <Game key={game.id} game={game} />
                                     ))}
                                 </div>
                         }
                     </div>
                 </div>
+            </div>
+
+            <div className="profile_go_order_history" onClick={() => window.location.href = '/orders'}>
+                <img src={shopping} alt="Order history" className="profile_go_order_history_img" />
+                <text className="profile_go_order_history_text">Mes commandes</text>
             </div>
         </div>
     );

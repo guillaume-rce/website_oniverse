@@ -101,6 +101,65 @@ const internal = mysql.createConnection({
 /**
  * @swagger
  * /orders:
+ *   get:
+ *     summary: Retrieve all orders, with optional filters
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Filter orders by date (YYYY-MM-DD), returns orders on or after this date.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Limit the number of returned orders, retrieves only the most recent orders.
+ *     responses:
+ *       200:
+ *         description: A list of all orders, optionally filtered by date and/or limited by number.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Order'
+ *       500:
+ *         description: Server error occurred while fetching orders.
+ */
+router.get('/', (req, res) => {
+    let query = 'SELECT * FROM `order`';
+    const queryParams = [];
+    const { date, limit } = req.query;
+
+    if (date) {
+        query += ' WHERE creationDateTime >= ?';
+        queryParams.push(date);
+    }
+
+    query += ' ORDER BY creationDateTime DESC';
+
+    if (limit) {
+        query += ' LIMIT ?';
+        queryParams.push(parseInt(limit));
+    }
+
+    internal.query(query, queryParams, (error, results) => {
+        if (error) {
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /orders:
  *   post:
  *     summary: Create a new order
  *     tags: [Orders]

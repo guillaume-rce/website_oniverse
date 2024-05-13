@@ -14,9 +14,17 @@ const internal = mysql.createConnection({
 
 /**
  * @swagger
+ *  tags:
+ *      name: Delivery
+ *      description: Gestion des méthodes de livraison
+ */
+
+/**
+ * @swagger
  * /delivery:
  *   get:
  *     summary: Retrieve a list of delivery methods
+ *     tags: [Delivery]
  *     responses:
  *       200:
  *         description: A list of delivery methods
@@ -56,6 +64,7 @@ router.get('/', (req, res) => {
  * /delivery/{id}:
  *   get:
  *     summary: Retrieve a single delivery method by ID
+ *     tags: [Delivery]
  *     parameters:
  *       - in: path
  *         name: id
@@ -108,6 +117,7 @@ router.get('/:id', (req, res) => {
  * /delivery/{id}:
  *   delete:
  *     summary: Delete a delivery method by ID
+ *     tags: [Delivery]
  *     parameters:
  *       - in: path
  *         name: id

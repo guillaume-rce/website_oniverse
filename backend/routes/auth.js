@@ -16,9 +16,17 @@ const internal = mysql.createConnection({
 
 /**
  * @swagger
+ *  tags:
+ *   name: Authentification
+ *   description: Gestion de l'authentification des utilisateurs
+ */
+
+/**
+ * @swagger
  * /auth/signup:
  *   post:
  *     summary: Create a new user
+ *     tags: [Authentification]
  *     requestBody:
  *       required: true
  *       content:
@@ -88,6 +96,7 @@ router.post('/signup', (req, res, next) => {
  * /auth/login:
  *   post:
  *     summary: User login
+ *     tags: [Authentification]
  *     requestBody:
  *       required: true
  *       content:
