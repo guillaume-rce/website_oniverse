@@ -38,40 +38,53 @@ const internal = mysql.createConnection({
  *         - state
  *         - deliveryMethod
  *         - total
+ *         - creationDateTime
+ *         - lastUpdateDateTime
  *       properties:
  *         id:
  *           type: integer
- *           description: The unique identifier for the order.
+ *           format: int32
+ *           description: The unique identifier for the order, automatically incremented.
  *         user:
  *           type: integer
+ *           format: int32
  *           description: The user ID associated with the order.
  *         name:
  *           type: string
- *           description: The recipient's full name.
+ *           description: The recipient's full name. Stored as text in the database.
  *         country:
  *           type: string
- *           description: The recipient's country.
+ *           description: The recipient's country. Stored as text in the database.
  *         zipcode:
  *           type: string
- *           description: The postal code for the delivery address.
+ *           description: The postal code for the delivery address. Stored as tinytext in the database.
  *         address:
  *           type: string
- *           description: The delivery address.
+ *           description: The full delivery address. Stored as text in the database.
  *         paymentMode:
  *           type: string
  *           enum: [CB, PAYPAL]
- *           description: The payment method used.
+ *           default: CB
+ *           description: The payment method used. Defaults to 'CB' if not specified.
  *         state:
  *           type: string
  *           enum: ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE']
  *           description: The current state of the order.
  *         deliveryMethod:
  *           type: integer
+ *           format: int32
  *           description: The identifier for the delivery method used.
  *         total:
- *           type: number
- *           format: float
- *           description: The total cost of the order.
+ *           type: integer
+ *           description: The total cost of the order, stored as an integer.
+ *         creationDateTime:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time when the order was created, defaults to the current timestamp.
+ *         lastUpdateDateTime:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time when the order was last updated, defaults to the current timestamp.
  *     Item:
  *       type: object
  *       required:
@@ -118,9 +131,16 @@ const internal = mysql.createConnection({
  *           type: integer
  *         required: false
  *         description: Limit the number of returned orders, retrieves only the most recent orders.
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         required: false
+ *         description: Order the results ascendingly or descendingly by creation date. Default is descending.
  *     responses:
  *       200:
- *         description: A list of all orders, optionally filtered by date and/or limited by number.
+ *         description: A list of all orders, optionally filtered by date and/or limited by number, and sorted by specified order.
  *         content:
  *           application/json:
  *             schema:
@@ -133,14 +153,16 @@ const internal = mysql.createConnection({
 router.get('/', (req, res) => {
     let query = 'SELECT * FROM `order`';
     const queryParams = [];
-    const { date, limit } = req.query;
+    const { date, limit, sortOrder } = req.query;
 
     if (date) {
         query += ' WHERE creationDateTime >= ?';
         queryParams.push(date);
     }
 
-    query += ' ORDER BY creationDateTime DESC';
+    // Set the default sort order to descending unless specified otherwise
+    const orderDirection = sortOrder === 'asc' ? 'ASC' : 'DESC';
+    query += ` ORDER BY creationDateTime ${orderDirection}`;
 
     if (limit) {
         query += ' LIMIT ?';

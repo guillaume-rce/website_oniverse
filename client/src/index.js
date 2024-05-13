@@ -8,6 +8,7 @@ import Profile from './app/Pages/Profile';
 import ShoppingCart from './app/Pages/ShoppingCart';
 import QuatreCentQuatre from './app/Pages/NotFound';
 import OrderHistory from './app/Pages/OrderHistory';
+import Admin from './app/Pages/Admin';
 
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router , Route , Switch } from 'react-router-dom/cjs/react-router-dom.min';
@@ -24,6 +25,7 @@ root.render(
         <Route exact path="/profile" component={Profile} />
         <Route exact path="/shopping-cart" component={ShoppingCart} />
         <Route exact path="/orders" component={OrderHistory} />
+        <Route exact path="/admin" component={Admin} />
         <Route component={QuatreCentQuatre} />
       </Switch>
     </Router>

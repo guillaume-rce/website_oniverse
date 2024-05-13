@@ -36,6 +36,117 @@ const upload = multer({ storage: storage });
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - id
+ *         - pseudo
+ *         - email
+ *         - password
+ *         - role
+ *         - registrationDateTime
+ *       properties:
+ *         id:
+ *           type: integer
+ *           format: int32
+ *           description: The unique identifier for the user, automatically incremented.
+ *         pseudo:
+ *           type: string
+ *           description: The nickname or username of the user.
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The email address of the user, used for logging in and communication.
+ *         password:
+ *           type: string
+ *           format: password
+ *           description: The hashed password for the user's account.
+ *         image:
+ *           type: string
+ *           nullable: true
+ *           description: URL path to the user's profile image, can be null.
+ *         banner:
+ *           type: string
+ *           nullable: true
+ *           description: URL path to the user's banner image, can be null.
+ *         bio:
+ *           type: string
+ *           format: textarea
+ *           nullable: true
+ *           description: A longer description or biography of the user, can be null.
+ *         role:
+ *           type: integer
+ *           description: Numeric role identifier, where different numbers correspond to different roles within the system.
+ *         registrationDateTime:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time when the user was registered.
+ */
+
+/**
+ * @swagger
+ * /user:
+ *   get:
+ *     summary: Retrieve all users or filter users based on parameters
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter users by email address
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter users by role
+ *     responses:
+ *       200:
+ *         description: A list of users, filtered by the specified parameters if any
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Server error
+ */
+router.get('/', (req, res) => {
+    let query = 'SELECT * FROM users';
+    const filterParams = [];
+    const conditions = [];
+
+    if (req.query.email) {
+        conditions.push('email = ?');
+        filterParams.push(req.query.email);
+    }
+
+    if (req.query.role) {
+        conditions.push('role = ?');
+        filterParams.push(req.query.role);
+    }
+
+    if (conditions.length > 0) {
+        query += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    internal.query(query, filterParams, (error, results) => {
+        if (error) {
+            console.error('Error during SELECT query:', error);
+            res.status(500).json({ error: 'Server error during SELECT query.' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+
+/**
+ * @swagger
  * /user/pseudo:
  *   post:
  *     summary: Update the user's pseudo
@@ -275,40 +386,7 @@ router.post('/image/:type', upload.single('image'), async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: The user ID
- *                   example: 1
- *                 pseudo:
- *                   type: string
- *                   description: The user's pseudo
- *                   example: username
- *                 email:
- *                   type: string
- *                   description: The user's email
- *                   example: user@example.com
- *                 banner:
- *                   type: string
- *                   description: The user's banner image URL
- *                   example: /img/1622483492-banner.jpg
- *                 image:
- *                   type: string
- *                   description: The user's profile image URL
- *                   example: /img/1622483492-profile.jpg
- *                 bio:
- *                   type: string
- *                   description: The user's bio
- *                   example: This is my bio
- *                 role:
- *                   type: string
- *                   description: The user's role
- *                   example: user
- *                 registrationDateTime:
- *                   type: string
- *                   format: date-time
- *                   description: The date and time the user registered
- *                   example: 2024-05-07T10:00:00Z
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
  */
