@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 13, 2024 at 05:31 PM
+-- Generation Time: May 14, 2024 at 04:15 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -50,16 +50,17 @@ CREATE TABLE `games` (
   `logo` int(11) NOT NULL,
   `image` int(11) NOT NULL,
   `price` float DEFAULT NULL,
-  `url` text
+  `url` text,
+  `stock` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `games`
 --
 
-INSERT INTO `games` (`id`, `name`, `description`, `logo`, `image`, `price`, `url`) VALUES
-(1, 'Space Navigator', 'Explorer l\'espace et visiter des lieux inconnus !\nRecoltez des ressources et améliorez votre vaisseau pour aller toujours plus loin !', 0, 1, 9.8, 'http://www.game4.com'),
-(2, 'EmojiQuizz', 'Trouvez le mot représenté par les emojis !\nPlus de 100 niveaux vous attendent !', 0, 2, 4.7, 'http://www.game4.com');
+INSERT INTO `games` (`id`, `name`, `description`, `logo`, `image`, `price`, `url`, `stock`) VALUES
+(1, 'Space Navigator', 'Explorer l\'espace et visiter des lieux inconnus !\nRecoltez des ressources et améliorez votre vaisseau pour aller toujours plus loin !', 0, 1, 9.9, 'http://www.game4.com', 6),
+(2, 'EmojiQuizz', 'Trouvez le mot représenté par les emojis !\nPlus de 100 niveaux vous attendent !', 0, 2, 4.5, 'http://www.game4.com', 2);
 
 -- --------------------------------------------------------
 
@@ -192,12 +193,13 @@ CREATE TABLE `order` (
 
 INSERT INTO `order` (`id`, `user`, `name`, `country`, `zipcode`, `address`, `paymentMode`, `deliveryMethod`, `total`, `state`, `creationDateTime`, `lastUpdateDateTime`) VALUES
 (1, 1, 'John Doe', 'USA', '90210', '1234 Boulevard St.', 'CB', 1, 59, 'CONFIRMED', '2024-05-11 17:07:43', '2024-05-11 17:07:43'),
-(2, 1, 'Test', 'TestLand', '49100', '45 rue du Test', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-11 17:17:12', '2024-05-11 17:17:12'),
+(2, 1, 'Test', 'TestLand', '49100', '45 rue du Test', 'PAYPAL', 2, 29, 'IN_PREPARATION', '2024-05-11 17:17:12', '2024-05-11 17:17:12'),
 (3, 1, 'TESTClear', 'jppjspojLand', '45666', '6 rue du heçhidh', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-12 13:54:59', '2024-05-12 13:54:59'),
 (4, 1, 'Roche', 'IDYhdouhdohuLand', '49100', '5 rue du iyufdigdsiygsigdso', 'PAYPAL', 2, 15, 'CONFIRMED', '2024-05-13 08:37:10', '2024-05-13 08:37:10'),
 (5, 4, 'Random', 'dhihudiuh', '63763', 'ihufdhiduh', 'CB', 2, 5, 'CONFIRMED', '2024-05-13 15:54:47', '2024-05-13 15:54:47'),
 (6, 4, 'Random', 'zkposkpoz', '55453', 'udhohudh', 'PAYPAL', 2, 10, 'CONFIRMED', '2024-05-13 15:55:39', '2024-05-13 15:55:39'),
-(7, 1, 'Roche', 'shoshdohuds', '45452', 'dhouuhdouhd', 'CB', 2, 24, 'CONFIRMED', '2024-05-13 17:32:33', '2024-05-13 17:32:33');
+(7, 1, 'Roche', 'shoshdohuds', '45452', 'dhouuhdouhd', 'CB', 2, 24, 'CONFIRMED', '2024-05-13 17:32:33', '2024-05-13 17:32:33'),
+(8, 1, 'TestAdmin', 'zsoijzoj', '35335', 'idjdi', 'CB', 2, 39, 'CONFIRMED', '2024-05-14 13:47:27', '2024-05-14 13:47:27');
 
 -- --------------------------------------------------------
 
@@ -227,7 +229,9 @@ INSERT INTO `order_item` (`id`, `order_id`, `item_id`, `quantity`, `isDigital`) 
 (7, 5, 2, 1, 1),
 (8, 6, 1, 1, 1),
 (9, 7, 1, 1, 1),
-(10, 7, 2, 3, 1);
+(10, 7, 2, 3, 1),
+(11, 8, 2, 2, 1),
+(12, 8, 1, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -311,13 +315,13 @@ ALTER TABLE `discount_code`
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`

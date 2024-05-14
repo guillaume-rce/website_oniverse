@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import DailyReport from '../components/admin/DailyReport';
+import LastOrders from '../components/admin/LastOrders';
+import Games from '../components/admin/Games';
+import { CartProvider } from '../CartContext';
 
 import './Admin.css';
 
@@ -30,6 +33,7 @@ const Admin = () => {
     }, []);
 
     const [orders, setOrders] = useState([]);
+    const [lastOrders, setLastOrders] = useState([]);
     const [games, setGames] = useState([]);
     const [users, setUsers] = useState([]);
     const [delivery, setDelivery] = useState([]);
@@ -52,78 +56,107 @@ const Admin = () => {
                 setOrders(data);
             });
 
-    fetch('http://localhost:3001/games')
-        .then(
-            (response) => response.json(),
-            (error) => {
-                console.error('Failed to fetch games', error);
-                setError('Failed to fetch games');
-            }
-        )
-        .then((data) => {
-            if (!data) {
-                console.error('No games found');
-                return;
-            }
+        fetch('http://localhost:3001/orders?limit=5&sortOrder=desc')
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch last orders', error);
+                    setError('Failed to fetch last orders');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No last orders found');
+                    return;
+                }
 
-            setGames(data);
-        });
+                setLastOrders(data);
+            });
 
-    fetch('http://localhost:3001/user')
-        .then(
-            (response) => response.json(),
-            (error) => {
-                console.error('Failed to fetch users', error);
-                setError('Failed to fetch users');
-            }
-        )
-        .then((data) => {
-            if (!data) {
-                console.error('No users found');
-                return;
-            }
+        fetch('http://localhost:3001/games')
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch games', error);
+                    setError('Failed to fetch games');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No games found');
+                    return;
+                }
 
-            setUsers(data);
-        });
+                setGames(data);
+            });
 
-    fetch('http://localhost:3001/delivery')
-        .then(
-            (response) => response.json(),
-            (error) => {
-                console.error('Failed to fetch delivery', error);
-                setError('Failed to fetch delivery');
-            }
-        )
-        .then((data) => {
-            if (!data) {
-                console.error('No delivery found');
-                return;
-            }
+        fetch('http://localhost:3001/user')
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch users', error);
+                    setError('Failed to fetch users');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No users found');
+                    return;
+                }
 
-            setDelivery(data);
-        });
-}, []);
+                setUsers(data);
+            });
 
-if (!user) {
-    return <div>Loading...</div>;
-}
+        fetch('http://localhost:3001/delivery')
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch delivery', error);
+                    setError('Failed to fetch delivery');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No delivery found');
+                    return;
+                }
 
-if (user.role !== 1) {
-    window.location.href = '/';
-}
+                setDelivery(data);
+            });
+    }, []);
 
-if (orders.length === 0 || games.length === 0 || users.length === 0 || delivery.length === 0) {
-    return <div>Loading...</div>;
-}
+    if (!user) {
+        return <div>Loading...</div>;
+    }
 
-return (
-    <div className="admin">
-        <Header hide={false} />
-        <div className="dashboard">
-            <DailyReport orders={orders} />
+    if (user.role !== 1) {
+        window.location.href = '/';
+    }
+
+    if (orders.length === 0 || games.length === 0 || users.length === 0 || delivery.length === 0) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <div className="admin">
+            <CartProvider>
+                <Header hide={false} />
+            </CartProvider>
+            <div className="dashboard">
+                <div style={{ height: '400px', width: '100%' }}>
+                    <DailyReport orders={orders} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', height: '400px', width: '100%' }}>
+                    <div style={{ width: '33%' }}>
+                        <LastOrders orders={lastOrders} className="last-orders" />
+                    </div>
+                    <div style={{ width: '66%' }}>
+                        <Games games={games} className="games" />
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
 }
 
 export default Admin;

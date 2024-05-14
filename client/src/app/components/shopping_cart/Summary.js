@@ -4,9 +4,9 @@ import './Summary.css';
 
 function Summary(props) {
     const { cart } = useCart();
-    const [deliveryCharge, setDeliveryCharge] = useState(0);
 
     const { deliveryMethods, deliveryMethod, setCheckout, setDeliveryMethod, setTotal } = props;
+    const [deliveryCharge, setDeliveryCharge] = useState(deliveryMethod.cost);
 
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -45,7 +45,7 @@ function Summary(props) {
                 <span>{(total + deliveryCharge).toFixed(2)} €</span>
             </div>
             <button className="checkout"
-                disabled={cart.length === 0 || !deliveryMethod}
+                disabled={cart.length === 0}
                 onClick={() => {
                     setTotal((total + deliveryCharge).toFixed(2));
                     setCheckout(true);

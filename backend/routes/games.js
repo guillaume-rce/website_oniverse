@@ -44,6 +44,7 @@ const upload = multer({ storage: storage });
  *         - name
  *         - image
  *         - price
+ *         - stock
  *       properties:
  *         id:
  *           type: integer
@@ -90,6 +91,9 @@ const upload = multer({ storage: storage });
  *           type: number
  *           format: float
  *           description: Selling price of the game
+ *         stock:
+ *           type: integer
+ *           description: Current stock quantity of the game
  *         url:
  *           type: string
  *           description: Official URL for the game
@@ -116,7 +120,7 @@ const upload = multer({ storage: storage });
 router.get('/', (req, res) => {
     const query = `
         SELECT 
-            games.id, games.name, games.description, games.price, games.url,
+            games.id, games.name, games.description, games.price, games.stock, games.url,
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
@@ -137,16 +141,17 @@ router.get('/', (req, res) => {
                 image: {
                     id: game.image_id,
                     path: game.image_path,
-                    isLight: game.image_isLight,
-                    uploadDateTime: game.image_uploadDateTime
+                    isLight: game.isLight,
+                    uploadDateTime: game.uploadDateTime
                 },
                 logo: game.logo_id ? {
                     id: game.logo_id,
                     path: game.logo_path,
-                    isLight: game.logo_isLight,
-                    uploadDateTime: game.logo_uploadDateTime
+                    isLight: game.isLight,
+                    uploadDateTime: game.uploadDateTime
                 } : null,
                 price: game.price,
+                stock: game.stock,
                 url: game.url
             }));
             res.status(200).json(formattedResults);
@@ -374,7 +379,7 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
  * @swagger
  * /games/{id}:
  *   get:
- *     summary: Retrieve a single game by ID
+ *     summary: Retrieve a single game by ID including stock information
  *     tags: [Games]
  *     parameters:
  *       - in: path
@@ -399,7 +404,7 @@ router.get('/:id', (req, res) => {
     const gameId = req.params.id;
     const query = `
         SELECT 
-            games.id, games.name, games.description, games.price, games.url,
+            games.id, games.name, games.description, games.price, games.url, games.stock,
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
@@ -431,15 +436,146 @@ router.get('/:id', (req, res) => {
                 logo: game.logo_id ? {
                     id: game.logo_id,
                     path: game.logo_path,
-                    isLight: game.logo_isLight,
-                    uploadDateTime: game.logo_uploadDateTime
+                    isLight: game.isLight,
+                    uploadDateTime: game.uploadDateTime
                 } : null,
                 price: game.price,
-                url: game.url
+                url: game.url,
+                stock: game.stock
             };
             res.status(200).json(formattedGame);
         }
     });
 });
+
+/**
+ * @swagger
+ * /games/{id}/stock:
+ *   put:
+ *     summary: Update the stock for a specified game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               stock:
+ *                 type: integer
+ *                 description: New stock quantity
+ *                 example: 50
+ *     responses:
+ *       200:
+ *         description: Game stock updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Game stock updated successfully.
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/:id/stock', (req, res) => {
+    const gameId = req.params.id;
+    const { stock } = req.body;
+
+    if (typeof stock !== 'number' || stock < 0) {
+        return res.status(400).json({ error: 'Invalid stock value. Stock must be a non-negative integer.' });
+    }
+
+    const query = 'UPDATE games SET stock = ? WHERE id = ?';
+    content.query(query, [stock, gameId], (error, result) => {
+        if (error) {
+            console.error('Error during UPDATE query:', error);
+            res.status(500).json({ error: 'Server error during UPDATE query.' });
+        } else {
+            if (result.affectedRows === 0) {
+                res.status(404).json({ error: 'Game not found.' });
+            } else {
+                res.status(200).json({ message: 'Game stock updated successfully.' });
+            }
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /games/{id}/price:
+ *   put:
+ *     summary: Update the price of a specific game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: New price of the game
+ *                 example: 59.99
+ *     responses:
+ *       200:
+ *         description: Game price updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Game price updated successfully.
+ *       400:
+ *         description: Invalid input, object invalid
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/:id/price', (req, res) => {
+    const gameId = req.params.id;
+    const { price } = req.body;
+
+    if (typeof price !== 'number' || price < 0) {
+        return res.status(400).json({ error: 'Invalid price. Price must be a positive number.' });
+    }
+
+    const query = 'UPDATE games SET price = ? WHERE id = ?';
+    content.query(query, [price, gameId], (error, results) => {
+        if (error) {
+            console.error('Error during the UPDATE query:', error);
+            res.status(500).json({ error: 'Server error during the UPDATE query.' });
+        } else if (results.affectedRows === 0) {
+            res.status(404).json({ error: 'Game not found.' });
+        } else {
+            res.status(200).json({ message: 'Game price updated successfully.' });
+        }
+    });
+});
+
 
 module.exports = router;
