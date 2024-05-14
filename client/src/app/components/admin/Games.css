@@ -39,11 +39,21 @@
     box-sizing: border-box;
 }
 
+.report-game:hover {
+    background-color: #e0e0e0;
+}
+
 .game-image {
     width: 100%;
     max-width: 100px;
     height: auto;
     border-radius: 5px;
+}
+
+.game-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
 }
 
 .game-input {
@@ -58,4 +68,24 @@
 
 .game-input:hover {
     border: 1px solid #e69005;
+}
+
+.view-all-games {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #f49702;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: auto;
+}
+
+.view-all-games:hover {
+    background-color: #f5a623;
 }

@@ -11,6 +11,9 @@ const Games = ( { games } ) => {
                     <Game key={game.id} game={game} />
                 ))}
             </div>
+            <button className="view-all-games"
+                onClick={() => window.location.href = '/admin-games'}
+            >Voir tous les jeux</button>
         </div>
     );
 }

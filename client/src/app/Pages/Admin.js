@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import DailyReport from '../components/admin/DailyReport';
 import LastOrders from '../components/admin/LastOrders';
 import Games from '../components/admin/Games';
+import DeliveryMethods from '../components/admin/DeliveryMethods';
 import { CartProvider } from '../CartContext';
 
 import './Admin.css';
@@ -153,6 +154,9 @@ const Admin = () => {
                     <div style={{ width: '66%' }}>
                         <Games games={games} className="games" />
                     </div>
+                </div>
+                <div style={{ height: '160px', width: '100%' }}>
+                    <DeliveryMethods deliveryMethods={delivery} />
                 </div>
             </div>
         </div>
