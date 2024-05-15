@@ -34,6 +34,10 @@
     box-sizing: border-box;
 }
 
+.order:hover {
+    background-color: #e0e0e0;
+}
+
 .order-id {
     font-size: 1rem;
     font-weight: bold;

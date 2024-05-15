@@ -16,6 +16,8 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
     const handleCheckout = async (e) => {
         e.preventDefault(); // Prevent default form submission
 
+        console.log('Checkout:', name, paymentMethod, zipcode, country, address, deliveryMethod);
+
         if (!name || !paymentMethod || !zipcode || !country || !address || !deliveryMethod) {
             setError('Please fill in all fields.');
             return;

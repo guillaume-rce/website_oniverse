@@ -11,8 +11,8 @@
 }
 
 .info-icon-container {
+    width: 40%;
     height: 100%;
-    width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;

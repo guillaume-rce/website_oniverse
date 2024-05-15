@@ -154,6 +154,9 @@ const Admin = () => {
                 <Header hide={false} />
             </CartProvider>
             <div className="dashboard">
+                <div className="welcome">
+                    <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}>Welcome back to your dashboard, {user.pseudo}!</label>
+                </div>
                 <div style={{ height: '400px', width: '100%' }}>
                     <DailyReport orders={orders} />
                 </div>
@@ -169,9 +172,9 @@ const Admin = () => {
                     <DeliveryMethods deliveryMethods={delivery} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', height: '200px', width: '100%' }}>
-                    <Info title="Total orders" content={totalSell + ' orders'} icon="https://img.icons8.com/ios/452/shopping-cart.png" />
-                    <Info title="Total benefit" content={totalBenefit + ' €'} icon="https://img.icons8.com/ios/452/money.png" />
-                    <Info title="Total users" content={totalUsers + ' users'} icon="https://img.icons8.com/ios/452/user.png" />
+                    <Info title="Total orders" num={totalSell} type="orders" icon="https://img.icons8.com/ios/452/shopping-cart.png" />
+                    <Info title="Total benefit" num={totalBenefit} type="€" icon="https://img.icons8.com/ios/452/money.png" />
+                    <Info title="Total users" num={totalUsers} type="users" icon="https://img.icons8.com/ios/452/user.png" />
                 </div>
                 <div style={{ height: '400px', width: '100%' }}>
                     <Users users={users} />

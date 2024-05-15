@@ -5,9 +5,14 @@ import './Summary.css';
 function Summary(props) {
     const { cart } = useCart();
 
-    const { deliveryMethods, deliveryMethod, setCheckout, setDeliveryMethod, setTotal } = props;
-    const [deliveryCharge, setDeliveryCharge] = useState(deliveryMethod.cost);
-    console.log(deliveryCharge);
+    const { deliveryMethods, setCheckout, setDeliveryMethod, setTotal } = props;
+    let { deliveryMethod } = props;
+    const [deliveryCharge, setDeliveryCharge] = useState(deliveryMethod ? deliveryMethod.cost : 0);
+
+    if (!deliveryMethod && deliveryMethods.length > 0) {
+        deliveryMethod = deliveryMethods[0];
+        setDeliveryMethod(deliveryMethod);
+    }
 
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -24,7 +29,7 @@ function Summary(props) {
                     <label className="summary-shipping-info">Every digital purchase is delivered by email, it is free of charge.</label>
                     <select className="summary-input"
                         onChange={(e) => {
-                            setDeliveryMethod(parseInt(e.target.key));
+                            setDeliveryMethod(deliveryMethods.find((method) => method.id === parseInt(e.target.value)));
                             setDeliveryCharge(parseFloat(e.target.value));
                         }}>
                         {deliveryMethods.map((method) => (
