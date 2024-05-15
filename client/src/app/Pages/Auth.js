@@ -110,8 +110,8 @@ function Auth() {
               <input type="password" className="text_input" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <div className="remember">
-              <input type="checkbox" className="login_checkbox" />
-              <label className="login_checkbox_label" onClick={() => setRememberMe(!rememberMe)}>Remember me</label>
+              <input type="checkbox" className="login_checkbox" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
+              <label className="login_checkbox_label" onClick={() => setRememberMe(!rememberMe)} style={{ cursor: 'pointer' }}>Remember me</label>
             </div>
             <button className="button">Login</button>
           </form>

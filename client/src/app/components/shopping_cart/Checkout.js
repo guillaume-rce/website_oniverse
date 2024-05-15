@@ -42,7 +42,7 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
             address,
             paymentMode: paymentMethod,
             state: 'CONFIRMED',
-            deliveryMethod,
+            deliveryMethod: deliveryMethod.id,
             total,
             items
         };
