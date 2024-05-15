@@ -6,10 +6,10 @@ function Item({ item }) {
     const { addToCart, removeFromCart, removeAllFromCart } = useCart();
 
     return (
-        <div className="item">
+        <div className="item-container">
             <div className="item-info">
                 <img src={item.image.path} alt={item.name} className="image" />
-                <div className="info">
+                <div className="info-cart">
                     <label className="name">{item.name}</label>
                     <label className="description">{item.description}</label>
                 </div>

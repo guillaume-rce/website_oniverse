@@ -23,7 +23,7 @@ const ShoppingCart = () => {
                 }
 
                 setDeliveryMethods(data);
-                setDeliveryMethod(data[1].id);
+                setDeliveryMethod(data[1]);
             });
     }, []);
 

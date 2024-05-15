@@ -7,6 +7,7 @@ function Summary(props) {
 
     const { deliveryMethods, deliveryMethod, setCheckout, setDeliveryMethod, setTotal } = props;
     const [deliveryCharge, setDeliveryCharge] = useState(deliveryMethod.cost);
+    console.log(deliveryCharge);
 
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -28,7 +29,7 @@ function Summary(props) {
                         }}>
                         {deliveryMethods.map((method) => (
                             method.available ? (
-                                <option key={method.id} value={method.cost} selected={deliveryMethod === method.id}>
+                                <option key={method.id} value={method.cost} selected={deliveryMethod.id === method.id}>
                                     {method.name} - {method.cost.toFixed(2)} €
                                 </option>
                             ) : null

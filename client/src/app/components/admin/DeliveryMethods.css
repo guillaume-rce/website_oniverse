@@ -46,10 +46,19 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     background-color: #f5f5f5;
     box-sizing: border-box;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.delivery-method * {
+    cursor: pointer;
+}
+
+.delivery-method:hover {
+    opacity: 0.85;
 }
 
 .add-delivery-method {
-    /* C'est un bouton, le rendre rond et au bonne couleur */
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -74,7 +83,7 @@
 }
 
 .add-delivery-method-icon.cross {
-    transform: rotate(45deg); /* Rotation de 45 degrés pour former une croix */
+    transform: rotate(45deg);
 }
 
 @keyframes fadeInUp {
@@ -100,13 +109,12 @@
 }
 
 .modal {
-    position: absolute;
+    position: fixed;
     background-color: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 8px rgba(0,0,0,0.5);
     z-index: 10;
-    transform: translate(-50%, -50%);
 }
 
 .fade-in {

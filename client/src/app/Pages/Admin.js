@@ -4,6 +4,8 @@ import DailyReport from '../components/admin/DailyReport';
 import LastOrders from '../components/admin/LastOrders';
 import Games from '../components/admin/Games';
 import DeliveryMethods from '../components/admin/DeliveryMethods';
+import Info from '../components/admin/Info';
+import Users from '../components/admin/Users';
 import { CartProvider } from '../CartContext';
 
 import './Admin.css';
@@ -138,6 +140,14 @@ const Admin = () => {
         return <div>Loading...</div>;
     }
 
+    let totalBenefit = 0;
+    orders.forEach((order) => {
+        totalBenefit += order.total;
+    });
+    
+    const totalSell = orders.length;
+    const totalUsers = users.length;
+
     return (
         <div className="admin">
             <CartProvider>
@@ -157,6 +167,14 @@ const Admin = () => {
                 </div>
                 <div style={{ height: '160px', width: '100%' }}>
                     <DeliveryMethods deliveryMethods={delivery} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', height: '200px', width: '100%' }}>
+                    <Info title="Total orders" content={totalSell + ' orders'} icon="https://img.icons8.com/ios/452/shopping-cart.png" />
+                    <Info title="Total benefit" content={totalBenefit + ' €'} icon="https://img.icons8.com/ios/452/money.png" />
+                    <Info title="Total users" content={totalUsers + ' users'} icon="https://img.icons8.com/ios/452/user.png" />
+                </div>
+                <div style={{ height: '400px', width: '100%' }}>
+                    <Users users={users} />
                 </div>
             </div>
         </div>
