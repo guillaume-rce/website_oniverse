@@ -37,6 +37,7 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     background-color: #f5f5f5;
     box-sizing: border-box;
+    transition: all 0.3s;
 }
 
 .report-game:hover {
