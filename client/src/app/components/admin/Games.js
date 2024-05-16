@@ -12,7 +12,7 @@ const Games = ( { games } ) => {
                 ))}
             </div>
             <button className="view-all-games"
-                onClick={() => window.location.href = '/admin-games'}
+                onClick={() => window.location.href = '/admin/games'}
             >Voir tous les jeux</button>
         </div>
     );

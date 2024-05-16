@@ -54,7 +54,7 @@ const Game = ({ game }) => {
     }
 
     return (
-        <div key={game.id} className="report-game" onClick={() => window.location.href = `/admin-games/${game.id}`}>
+        <div key={game.id} className="report-game" onClick={() => window.location.href = `/admin/games/${game.id}`}>
             <img src={game.image.path} alt={game.name} className="game-image" />
             <label className="game-name">{game.name}</label>
             <div>

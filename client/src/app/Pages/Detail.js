@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
 import GamePres from '../components/detail/GamePres';
+import { CartProvider } from '../CartContext';
 
 function Detail() {
     var { idGame } = useParams();
@@ -22,10 +23,12 @@ function Detail() {
     }
 
     return (
-        <div className="Detail">
-            <Header hide={false} />
-            { c_game ? <GamePres game={c_game} /> : <p>Le jeu numéro {idGame} n'existe pas</p> }
-        </div>
+        <CartProvider>
+            <div className="Detail">
+                <Header hide={false} />
+                { c_game ? <GamePres game={c_game} /> : <p>Le jeu numéro {idGame} n'existe pas</p> }
+            </div>
+        </CartProvider>
     );
 }
 

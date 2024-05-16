@@ -1,4 +1,5 @@
 import "./LastOrders.css";
+import Order from "./Order";
 
 const LastOrders = ({ orders }) => {
     return (
@@ -6,15 +7,11 @@ const LastOrders = ({ orders }) => {
             <label className="title">Dernières commandes</label>
             <div className="orders-container">
                 {orders.map((order) => (
-                    <div key={order.id} className="order" onClick={() => window.location.href = `/admin-orders/${order.id}`}>
-                        <label className="order-id">Order #{order.id}</label>
-                        <label className="order-date">{new Date(order.creationDateTime).toLocaleString()}</label>
-                        <label className="order-total">Total: {order.total} €</label>
-                    </div>
+                    <Order key={order.id} order={order} />
                 ))}
             </div>
             <button className="view-all-orders"
-                onClick={() => window.location.href = '/admin-orders'}
+                onClick={() => window.location.href = '/admin/orders'}
             >Voir toutes les commandes</button>
         </div>
     );

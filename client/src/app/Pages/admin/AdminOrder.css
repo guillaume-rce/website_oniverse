@@ -1,0 +1,39 @@
+.admin-order {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    background: url('https://images.unsplash.com/photo-1557683316-973673baf926');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100%;
+    padding: 70px 70px 20px 70px;
+    box-sizing: border-box;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-order-id {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.admin-order-date {
+    font-size: 1rem;
+    color: #555;
+}

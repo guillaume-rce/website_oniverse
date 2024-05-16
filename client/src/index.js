@@ -9,6 +9,8 @@ import ShoppingCart from './app/Pages/ShoppingCart';
 import QuatreCentQuatre from './app/Pages/NotFound';
 import OrderHistory from './app/Pages/OrderHistory';
 import Admin from './app/Pages/Admin';
+import AdminOrders from './app/Pages/admin/AdminOrders';
+import AdminOrder from './app/Pages/admin/AdminOrder';
 
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router , Route , Switch } from 'react-router-dom/cjs/react-router-dom.min';
@@ -26,6 +28,8 @@ root.render(
         <Route exact path="/shopping-cart" component={ShoppingCart} />
         <Route exact path="/orders" component={OrderHistory} />
         <Route exact path="/admin" component={Admin} />
+        <Route exact path="/admin/orders" component={AdminOrders} />
+        <Route exact path="/admin/orders/:id" component={AdminOrder} />
         <Route component={QuatreCentQuatre} />
       </Switch>
     </Router>
