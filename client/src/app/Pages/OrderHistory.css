@@ -1,4 +1,4 @@
-.order-background {
+.order-history-background {
     background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926');
     background-size: cover;
     background-position: center;
@@ -36,16 +36,18 @@
     border-radius: 8px;
 }
 
-.orders-title {
+.order-history-title {
     font-size: 3em;
     font-weight: bold;
     margin-bottom: 30px;
 }
 
-.orders {
+.orders-history {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    justify-content: center;
+    align-items: center;
     /* make it scrollable */
     overflow-y: auto;
     max-height: 100%;

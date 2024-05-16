@@ -274,6 +274,47 @@ router.get('/user/:userId', (req, res) => {
 
 /**
  * @swagger
+ * /orders/items/{id}:
+ *   get:
+ *     summary: Retrieve all items associated with a specific order ID
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           description: Order ID to retrieve items for.
+ *     responses:
+ *       200:
+ *         description: A list of order items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       404:
+ *         description: No items found for this order
+ *       500:
+ *         description: Server error
+ */
+router.get('/items/:id', (req, res) => {
+    const orderId = req.params.id;
+    internal.query('SELECT * FROM order_item WHERE order_id = ?', [orderId], (error, results) => {
+        if (error) {
+            console.error('Error during the SELECT query:', error);
+            res.status(500).json({ error: 'Server error during the SELECT query.' });
+        } else if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
+            res.status(404).json({ error: 'No items found for this order.' });
+        }
+    });
+});
+
+/**
+ * @swagger
  * /orders/{id}:
  *   get:
  *     summary: Retrieve a single order by ID
@@ -362,42 +403,79 @@ router.delete('/:id', (req, res) => {
 
 /**
  * @swagger
- * /orders/items/{id}:
- *   get:
- *     summary: Retrieve all items associated with a specific order ID
- *     tags: [Items]
+ * /orders/{id}/advance-state:
+ *   put:
+ *     summary: Advance the state of an order
+ *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: integer
- *           description: Order ID to retrieve items for.
+ *           description: The ID of the order to update.
+ *         required: true
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nextState:
+ *                 type: string
+ *                 description: The next state to set for the order. If not specified, it will automatically advance to the next logical state.
  *     responses:
  *       200:
- *         description: A list of order items
+ *         description: Order state updated successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Item'
+ *               $ref: '#/components/schemas/Order'
+ *       400:
+ *         description: Invalid request or state transition not allowed.
  *       404:
- *         description: No items found for this order
+ *         description: Order not found.
  *       500:
- *         description: Server error
+ *         description: Server error during updating order state.
  */
-router.get('/items/:id', (req, res) => {
+router.put('/:id/advance-state', (req, res) => {
     const orderId = req.params.id;
-    internal.query('SELECT * FROM order_item WHERE order_id = ?', [orderId], (error, results) => {
+    const { nextState } = req.body;
+
+    const validStates = ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE'];
+    const stateTransition = {
+        CONFIRMED: 'IN_PREPARATION',
+        IN_PREPARATION: 'SEND',
+        SEND: 'RECEIVED',
+        RECEIVED: 'CLOSED'
+    };
+
+    internal.query('SELECT state FROM `order` WHERE id = ?', [orderId], (error, results) => {
         if (error) {
             console.error('Error during the SELECT query:', error);
-            res.status(500).json({ error: 'Server error during the SELECT query.' });
-        } else if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
-            res.status(404).json({ error: 'No items found for this order.' });
+            return res.status(500).json({ error: 'Server error during the SELECT query.' });
         }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+        const currentState = results[0].state;
+        const newState = nextState || stateTransition[currentState];
+
+        if (!newState || !validStates.includes(newState) || !stateTransition[currentState]) {
+            return res.status(400).json({ error: 'Invalid state transition.' });
+        }
+
+        internal.query('UPDATE `order` SET state = ?, lastUpdateDateTime = NOW() WHERE id = ?', [newState, orderId], (updateError, updateResults) => {
+            if (updateError) {
+                console.error('Error during the UPDATE query:', updateError);
+                return res.status(500).json({ error: 'Server error during the UPDATE query.' });
+            }
+            if (updateResults.affectedRows === 0) {
+                return res.status(404).json({ error: 'Order not found.' });
+            }
+            res.status(200).json({ message: 'Order state updated successfully.', orderId: orderId, newState: newState });
+        });
     });
 });
 

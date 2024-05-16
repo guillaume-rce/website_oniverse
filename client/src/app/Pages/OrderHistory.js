@@ -37,13 +37,13 @@ const OrderHistory = () => {
     }
 
     return (
-        <div className="order-background">
+        <div className="order-history-background">
             <button className="back-button"
                 onClick={() => window.history.back()}
             >{"< BACK"}</button>
             <div className="order-history">
-                <label className='orders-title'>Order History</label>
-                <div className="orders">
+                <label className='order-history-title'>Order History</label>
+                <div className="orders-history">
                     {orders.map((order) => (
                         <Order key={order.id} order={order} />
                     ))}

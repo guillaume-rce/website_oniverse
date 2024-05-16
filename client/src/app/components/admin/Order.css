@@ -11,6 +11,11 @@
     background-color: #f5f5f5;
     box-sizing: border-box;
     transition: all 0.3s;
+    cursor: pointer;
+}
+
+.order * {
+    cursor: pointer;
 }
 
 .order:hover {
