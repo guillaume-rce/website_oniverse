@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 14, 2024 at 04:15 PM
+-- Generation Time: May 17, 2024 at 07:09 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -60,7 +60,7 @@ CREATE TABLE `games` (
 
 INSERT INTO `games` (`id`, `name`, `description`, `logo`, `image`, `price`, `url`, `stock`) VALUES
 (1, 'Space Navigator', 'Explorer l\'espace et visiter des lieux inconnus !\nRecoltez des ressources et améliorez votre vaisseau pour aller toujours plus loin !', 0, 1, 9.9, 'http://www.game4.com', 6),
-(2, 'EmojiQuizz', 'Trouvez le mot représenté par les emojis !\nPlus de 100 niveaux vous attendent !', 0, 2, 4.5, 'http://www.game4.com', 2);
+(2, 'EmojiQuizz', 'Trouvez le mot représenté par les emojis !\nPlus de 100 niveaux vous attendent !', 0, 2, 4.5, 'http://www.game4.com', 4);
 
 -- --------------------------------------------------------
 
@@ -82,6 +82,45 @@ CREATE TABLE `images` (
 INSERT INTO `images` (`id`, `path`, `isLight`, `uploadDateTime`) VALUES
 (1, 'http://localhost:3001/img/SpaceNavigator.webp', 0, '2024-04-18 14:41:40'),
 (2, 'http://localhost:3001/img/EmojiQuizz.webp', 0, '2024-04-18 14:41:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tags`
+--
+
+CREATE TABLE `tags` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `tags`
+--
+
+INSERT INTO `tags` (`id`, `name`) VALUES
+(1, '2D'),
+(2, 'Space');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tags_association`
+--
+
+CREATE TABLE `tags_association` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `idTag` int(10) UNSIGNED NOT NULL,
+  `idGame` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `tags_association`
+--
+
+INSERT INTO `tags_association` (`id`, `idTag`, `idGame`) VALUES
+(1, 1, 1),
+(2, 2, 1);
 
 --
 -- Indexes for dumped tables
@@ -106,6 +145,18 @@ ALTER TABLE `images`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tags`
+--
+ALTER TABLE `tags`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tags_association`
+--
+ALTER TABLE `tags_association`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -126,6 +177,18 @@ ALTER TABLE `games`
 --
 ALTER TABLE `images`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tags`
+--
+ALTER TABLE `tags`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tags_association`
+--
+ALTER TABLE `tags_association`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- Database: `internal_data`
 --
@@ -152,7 +215,9 @@ CREATE TABLE `delivery_method` (
 INSERT INTO `delivery_method` (`id`, `name`, `cost`, `available`) VALUES
 (1, 'Free delivery', 0, 1),
 (2, 'Express delivery', 5, 1),
-(3, 'Ultra fast delivery', 9.9, 1);
+(3, 'Ultra fast delivery', 9.9, 1),
+(4, 'ihdohuod', 10.2, 0),
+(5, 'Chronochiote', 7.1, 0);
 
 -- --------------------------------------------------------
 
@@ -192,14 +257,17 @@ CREATE TABLE `order` (
 --
 
 INSERT INTO `order` (`id`, `user`, `name`, `country`, `zipcode`, `address`, `paymentMode`, `deliveryMethod`, `total`, `state`, `creationDateTime`, `lastUpdateDateTime`) VALUES
-(1, 1, 'John Doe', 'USA', '90210', '1234 Boulevard St.', 'CB', 1, 59, 'CONFIRMED', '2024-05-11 17:07:43', '2024-05-11 17:07:43'),
 (2, 1, 'Test', 'TestLand', '49100', '45 rue du Test', 'PAYPAL', 2, 29, 'IN_PREPARATION', '2024-05-11 17:17:12', '2024-05-11 17:17:12'),
 (3, 1, 'TESTClear', 'jppjspojLand', '45666', '6 rue du heçhidh', 'PAYPAL', 2, 29, 'CONFIRMED', '2024-05-12 13:54:59', '2024-05-12 13:54:59'),
 (4, 1, 'Roche', 'IDYhdouhdohuLand', '49100', '5 rue du iyufdigdsiygsigdso', 'PAYPAL', 2, 15, 'CONFIRMED', '2024-05-13 08:37:10', '2024-05-13 08:37:10'),
-(5, 4, 'Random', 'dhihudiuh', '63763', 'ihufdhiduh', 'CB', 2, 5, 'CONFIRMED', '2024-05-13 15:54:47', '2024-05-13 15:54:47'),
+(5, 4, 'Random', 'dhihudiuh', '63763', 'ihufdhiduh', 'CB', 2, 5, 'CLOSED', '2024-05-13 15:54:47', '2024-05-17 13:59:45'),
 (6, 4, 'Random', 'zkposkpoz', '55453', 'udhohudh', 'PAYPAL', 2, 10, 'CONFIRMED', '2024-05-13 15:55:39', '2024-05-13 15:55:39'),
 (7, 1, 'Roche', 'shoshdohuds', '45452', 'dhouuhdouhd', 'CB', 2, 24, 'CONFIRMED', '2024-05-13 17:32:33', '2024-05-13 17:32:33'),
-(8, 1, 'TestAdmin', 'zsoijzoj', '35335', 'idjdi', 'CB', 2, 39, 'CONFIRMED', '2024-05-14 13:47:27', '2024-05-14 13:47:27');
+(8, 1, 'TestAdmin', 'zsoijzoj', '35335', 'idjdi', 'CB', 2, 39, 'CONFIRMED', '2024-05-14 13:47:27', '2024-05-14 13:47:27'),
+(9, 1, 'huihdiu', 'dokpodp', '66367', 'djpdjpd', 'CB', 2, 53, 'CONFIRMED', '2024-05-15 12:54:37', '2024-05-15 12:54:37'),
+(10, 1, 'Baptou', 'ejeiejizfpi', '34410', '5 rue du jojojdsp', 'PAYPAL', 1, 73, 'CONFIRMED', '2024-05-16 07:59:31', '2024-05-16 07:59:31'),
+(11, 1, 'TEst', 'France', '45455', 'rue borreau', 'PAYPAL', 2, 35, 'CONFIRMED', '2024-05-16 10:31:49', '2024-05-16 10:31:49'),
+(12, 1, 'Antoine', 'France', '49000', '5 rue balabala', 'PAYPAL', 1, 36, 'CLOSED', '2024-05-17 08:07:35', '2024-05-17 13:59:10');
 
 -- --------------------------------------------------------
 
@@ -231,7 +299,12 @@ INSERT INTO `order_item` (`id`, `order_id`, `item_id`, `quantity`, `isDigital`) 
 (9, 7, 1, 1, 1),
 (10, 7, 2, 3, 1),
 (11, 8, 2, 2, 1),
-(12, 8, 1, 3, 1);
+(12, 8, 1, 3, 1),
+(13, 10, 2, 4, 1),
+(14, 10, 1, 5, 1),
+(15, 11, 1, 3, 1),
+(16, 12, 1, 2, 1),
+(17, 12, 2, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -303,7 +376,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `delivery_method`
 --
 ALTER TABLE `delivery_method`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `discount_code`
@@ -315,13 +388,13 @@ ALTER TABLE `discount_code`
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`

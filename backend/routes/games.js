@@ -1,5 +1,3 @@
-// routes/games.js
-
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2');
@@ -42,6 +40,7 @@ const upload = multer({ storage: storage });
  *       required:
  *         - id
  *         - name
+ *         - logo
  *         - image
  *         - price
  *         - stock
@@ -97,13 +96,18 @@ const upload = multer({ storage: storage });
  *         url:
  *           type: string
  *           description: Official URL for the game
+ *         tags:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Tag'
+ *           description: List of tags associated with the game
  */
 
 /**
  * @swagger
  * /games:
  *   get:
- *     summary: Retrieve a list of games with their images and logos
+ *     summary: Retrieve a list of games with their images, logos, and tags
  *     tags: [Games]
  *     responses:
  *       200:
@@ -124,36 +128,53 @@ router.get('/', (req, res) => {
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
-            logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime
+            logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime,
+            tags.id AS tag_id, tags.name AS tag_name
         FROM games
         LEFT JOIN images AS mainImages ON games.image = mainImages.id
-        LEFT JOIN images AS logoImages ON games.logo = logoImages.id`;
+        LEFT JOIN images AS logoImages ON games.logo = logoImages.id
+        LEFT JOIN tags_association ON games.id = tags_association.idGame
+        LEFT JOIN tags ON tags_association.idTag = tags.id`;
 
     content.query(query, (error, results) => {
         if (error) {
             console.error('Error during SELECT query:', error);
             res.status(500).json({ error: 'Server error during SELECT query.' });
         } else {
-            const formattedResults = results.map(game => ({
-                id: game.id,
-                name: game.name,
-                description: game.description,
-                image: {
-                    id: game.image_id,
-                    path: game.image_path,
-                    isLight: game.isLight,
-                    uploadDateTime: game.uploadDateTime
-                },
-                logo: game.logo_id ? {
-                    id: game.logo_id,
-                    path: game.logo_path,
-                    isLight: game.isLight,
-                    uploadDateTime: game.uploadDateTime
-                } : null,
-                price: game.price,
-                stock: game.stock,
-                url: game.url
-            }));
+            const gamesMap = new Map();
+            results.forEach(row => {
+                if (!gamesMap.has(row.id)) {
+                    gamesMap.set(row.id, {
+                        id: row.id,
+                        name: row.name,
+                        description: row.description,
+                        image: {
+                            id: row.image_id,
+                            path: row.image_path,
+                            isLight: row.image_isLight,
+                            uploadDateTime: row.image_uploadDateTime
+                        },
+                        logo: row.logo_id ? {
+                            id: row.logo_id,
+                            path: row.logo_path,
+                            isLight: row.logo_isLight,
+                            uploadDateTime: row.logo_uploadDateTime
+                        } : null,
+                        price: row.price,
+                        stock: row.stock,
+                        url: row.url,
+                        tags: []
+                    });
+                }
+                const game = gamesMap.get(row.id);
+                if (row.tag_id) {
+                    game.tags.push({
+                        id: row.tag_id,
+                        name: row.tag_name
+                    });
+                }
+            });
+            const formattedResults = Array.from(gamesMap.values());
             res.status(200).json(formattedResults);
         }
     });
@@ -161,7 +182,7 @@ router.get('/', (req, res) => {
 
 /**
  * @swagger
- * /games/upload:
+ * /games:
  *   post:
  *     summary: Upload a new game and its main image
  *     tags: [Games]
@@ -186,9 +207,9 @@ router.get('/', (req, res) => {
  *                 type: number
  *                 format: float
  *                 description: Price of the game
- *               url:
+ *               tags:
  *                 type: string
- *                 description: Official URL for the game
+ *                 description: Comma-separated list of tags
  *     responses:
  *       201:
  *         description: Game successfully uploaded
@@ -197,12 +218,12 @@ router.get('/', (req, res) => {
  *       500:
  *         description: Server error during database operation
  */
-router.post('/upload', upload.single('image'), async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded.' });
     }
 
-    const { name, description, price, url } = req.body;
+    const { name, description, price, tags } = req.body;
     const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
 
     content.beginTransaction(async (err) => {
@@ -216,15 +237,32 @@ router.post('/upload', upload.single('image'), async (req, res) => {
             const [imageResult] = await content.promise().query(insertImageQuery, [imageUrl, 0]);
 
             const imageId = imageResult.insertId;
-            const insertGameQuery = 'INSERT INTO games (name, description, price, url, image) VALUES (?, ?, ?, ?, ?)';
-            await content.promise().query(insertGameQuery, [name, description, price, url, imageId]);
+            const insertGameQuery = 'INSERT INTO games (name, description, price, image) VALUES (?, ?, ?, ?)';
+            const [gameResult] = await content.promise().query(insertGameQuery, [name, description, price, imageId]);
+
+            const gameId = gameResult.insertId;
+
+            if (tags) {
+                const tagList = tags.split(',').map(tag => tag.trim());
+                for (const tagName of tagList) {
+                    const [tagResult] = await content.promise().query('SELECT id FROM tags WHERE name = ?', [tagName]);
+                    let tagId;
+                    if (tagResult.length === 0) {
+                        const [newTagResult] = await content.promise().query('INSERT INTO tags (name) VALUES (?)', [tagName]);
+                        tagId = newTagResult.insertId;
+                    } else {
+                        tagId = tagResult[0].id;
+                    }
+                    await content.promise().query('INSERT INTO tags_association (idTag, idGame) VALUES (?, ?)', [tagId, gameId]);
+                }
+            }
 
             content.commit((err) => {
                 if (err) {
                     console.error('Error during transaction commit:', err);
                     return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(201).json({ message: 'Game uploaded successfully.', gameId: imageId });
+                res.status(201).json({ message: 'Game uploaded successfully.', gameId: gameId });
             });
         } catch (error) {
             content.rollback(() => {
@@ -408,12 +446,14 @@ router.get('/:id', (req, res) => {
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
-            logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime
+            logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime,
+            tags.id AS tag_id, tags.name AS tag_name
         FROM games
         LEFT JOIN images AS mainImages ON games.image = mainImages.id
         LEFT JOIN images AS logoImages ON games.logo = logoImages.id
-        WHERE games.id = ?;
-    `;
+        LEFT JOIN tags_association ON games.id = tags_association.idGame
+        LEFT JOIN tags ON tags_association.idTag = tags.id
+        WHERE games.id = ?`;
 
     content.query(query, [gameId], (error, results) => {
         if (error) {
@@ -422,28 +462,36 @@ router.get('/:id', (req, res) => {
         } else if (results.length === 0) {
             res.status(404).json({ error: 'Game not found.' });
         } else {
-            const game = results[0];
-            const formattedGame = {
-                id: game.id,
-                name: game.name,
-                description: game.description,
+            const game = {
+                id: results[0].id,
+                name: results[0].name,
+                description: results[0].description,
                 image: {
-                    id: game.image_id,
-                    path: game.image_path,
-                    isLight: game.isLight,
-                    uploadDateTime: game.uploadDateTime
+                    id: results[0].image_id,
+                    path: results[0].image_path,
+                    isLight: results[0].image_isLight,
+                    uploadDateTime: results[0].image_uploadDateTime
                 },
-                logo: game.logo_id ? {
-                    id: game.logo_id,
-                    path: game.logo_path,
-                    isLight: game.isLight,
-                    uploadDateTime: game.uploadDateTime
+                logo: results[0].logo_id ? {
+                    id: results[0].logo_id,
+                    path: results[0].logo_path,
+                    isLight: results[0].logo_isLight,
+                    uploadDateTime: results[0].logo_uploadDateTime
                 } : null,
-                price: game.price,
-                url: game.url,
-                stock: game.stock
+                price: results[0].price,
+                url: results[0].url,
+                stock: results[0].stock,
+                tags: []
             };
-            res.status(200).json(formattedGame);
+            results.forEach(row => {
+                if (row.tag_id) {
+                    game.tags.push({
+                        id: row.tag_id,
+                        name: row.tag_name
+                    });
+                }
+            });
+            res.status(200).json(game);
         }
     });
 });
@@ -577,5 +625,87 @@ router.put('/:id/price', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /games/{id}/tags:
+ *   post:
+ *     summary: Associate tags with a specific game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of tags to associate with the game
+ *     responses:
+ *       200:
+ *         description: Tags associated successfully
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+router.post('/:id/tags', (req, res) => {
+    const gameId = req.params.id;
+    const { tags } = req.body;
+
+    if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {
+        return res.status(400).json({ error: 'Invalid tags. Tags must be an array of strings.' });
+    }
+
+    content.beginTransaction(async (err) => {
+        if (err) {
+            console.error('Error initiating transaction:', err);
+            return res.status(500).json({ error: 'Server error during transaction.' });
+        }
+
+        try {
+            for (const tagName of tags) {
+                const [tagResult] = await content.promise().query('SELECT id, name FROM tags WHERE name = ?', [tagName]);
+                let tagId;
+                if (tagResult.length === 0) {
+                    const [newTagResult] = await content.promise().query('INSERT INTO tags (name) VALUES (?)', [tagName]);
+                    tagId = newTagResult.insertId;
+                } else {
+                    tagId = tagResult[0].id;
+                }
+
+                const [tagAssocResult] = await content.promise().query(
+                    'SELECT * FROM tags_association WHERE idTag = ? AND idGame = ?', [tagId, gameId]
+                );
+
+                if (tagAssocResult.length === 0) {
+                    await content.promise().query('INSERT INTO tags_association (idTag, idGame) VALUES (?, ?)', [tagId, gameId]);
+                }
+            }
+
+            content.commit((err) => {
+                if (err) {
+                    console.error('Error during transaction commit:', err);
+                    return res.status(500).json({ error: 'Server error during transaction commit.' });
+                }
+                res.status(200).json({ message: 'Tags associated successfully.' });
+            });
+        } catch (error) {
+            content.rollback(() => {
+                console.error('Error updating data:', error);
+                res.status(500).json({ error: 'Server error updating data.' });
+            });
+        }
+    });
+});
 
 module.exports = router;

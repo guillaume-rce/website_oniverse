@@ -1,0 +1,228 @@
+.admin-game {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    background: url('https://images.unsplash.com/photo-1557683316-973673baf926');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    padding: 70px 70px 20px 70px;
+    box-sizing: border-box;
+}
+
+.admin-game-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.admin-game-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 300px;    
+}
+
+.admin-game-present {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 70%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-game-image {
+    height: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.admin-game-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-game-name {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.admin-game-description {
+    font-size: 1.5rem;
+    color: #555;
+}
+
+.admin-game-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.admin-game-stock {
+    font-size: 1.5rem;
+    color: #555;
+}
+
+.admin-game-selling {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 30%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-game-sell {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.admin-game-sell-value {
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1.5rem;
+    color: #555;
+}
+
+.admin-game-reports {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 400px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-game-reviews {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 150px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-game-tags {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 150px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+}
+
+.admin-game-tags-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-game-tags-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+
+    overflow-x: auto;
+    scrollbar-width: thin;
+    max-width: 100%;
+    scrollbar-color: #e69005 #f5f5f5;
+}
+
+.admin-game-tag {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 15px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    border: 1px solid #e69005;
+}
+
+.admin-game-tag-label {
+    font-size: 1.5rem;
+    color: #000;
+}
+
+.add-tag {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e69005;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    padding: 5px;
+}
+
+.add-tag:hover {
+    background-color: #f49702;
+}
+
+.add-tag-icon {
+    transition: transform 0.3s ease-in-out;
+    width: 100%;
+    height: 100%;
+}
+
+.add-tag-icon.cross {
+    transform: rotate(45deg);
+}

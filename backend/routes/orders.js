@@ -274,6 +274,35 @@ router.get('/user/:userId', (req, res) => {
 
 /**
  * @swagger
+ * /orders/items:
+ *   get:
+ *     summary: Retrieve all order items
+ *     tags: [Items]
+ *     responses:
+ *       200:
+ *         description: A list of all order items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       500:
+ *         description: Server error occurred while fetching order items
+ */
+router.get('/items', (req, res) => {
+    internal.query('SELECT * FROM order_item', (error, results) => {
+        if (error) {
+            console.error('Error during the SELECT query:', error);
+            res.status(500).json({ error: 'Server error during the SELECT query.' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+
+/**
+ * @swagger
  * /orders/items/{id}:
  *   get:
  *     summary: Retrieve all items associated with a specific order ID

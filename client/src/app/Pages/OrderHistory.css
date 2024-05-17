@@ -46,8 +46,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    justify-content: center;
-    align-items: center;
     /* make it scrollable */
     overflow-y: auto;
     max-height: 100%;

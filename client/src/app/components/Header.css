@@ -11,6 +11,8 @@
     justify-content: flex-start;
     font-size: 24px;
     z-index: 10;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .header_nav {

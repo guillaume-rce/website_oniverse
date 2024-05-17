@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Game from '../../components/admin/Game';
 import { CartProvider } from '../../CartContext';
 import Header from '../../components/Header';
+import './AdminGames.css';
 
 const AdminGames = () => {
     const [games, setGames] = useState([]);
@@ -28,6 +29,10 @@ const AdminGames = () => {
 
     if (!games) {
         return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
     }
 
     return (

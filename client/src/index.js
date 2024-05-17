@@ -12,6 +12,7 @@ import Admin from './app/Pages/Admin';
 import AdminOrders from './app/Pages/admin/AdminOrders';
 import AdminOrder from './app/Pages/admin/AdminOrder';
 import AdminGames from './app/Pages/admin/AdminGames';
+import AdminGame from './app/Pages/admin/AdminGame';
 
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router , Route , Switch } from 'react-router-dom/cjs/react-router-dom.min';
@@ -32,6 +33,7 @@ root.render(
         <Route exact path="/admin/orders" component={AdminOrders} />
         <Route exact path="/admin/orders/:id" component={AdminOrder} />
         <Route exact path="/admin/games" component={AdminGames} />
+        <Route exact path="/admin/games/:id" component={AdminGame} />
         <Route component={QuatreCentQuatre} />
       </Switch>
     </Router>

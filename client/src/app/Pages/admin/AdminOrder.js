@@ -198,6 +198,7 @@ const AdminOrder = () => {
     const nextStep = () => {
         const steps = ["CONFIRMED", "IN_PREPARATION", "SEND", "RECEIVED", "CLOSED"];
         const nextState = steps.indexOf(order.state) === steps.length - 1 ? order.state : steps[steps.indexOf(order.state) + 1];
+        console.log(nextState)
         fetch(`http://localhost:3001/orders/${order.id}/advance-state`, {
             method: 'PUT',
             headers: {

@@ -79,7 +79,7 @@ const Order = ({ order }) => {
                 <label>Total: {order.total} €</label>
                 <div className="payment-method">
                     <label>Payment Mode:</label>
-                    {order.paymentMethod === 'CB' ?
+                    {order.paymentMode === 'CB' ?
                         <img src={CB} alt="CB" className="method-icon" /> :
                         <img src={Paypal} alt="Paypal" className="method-icon" />}
                 </div>
