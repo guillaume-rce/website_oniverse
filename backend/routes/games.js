@@ -184,7 +184,7 @@ router.get('/', (req, res) => {
  * @swagger
  * /games:
  *   post:
- *     summary: Upload a new game and its main image
+ *     summary: Upload a new game with its main image and logo, specifying if they are light versions
  *     tags: [Games]
  *     requestBody:
  *       required: true
@@ -193,10 +193,6 @@ router.get('/', (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               image:
- *                 type: string
- *                 format: binary
- *                 description: Main image for the game
  *               name:
  *                 type: string
  *                 description: Name of the game
@@ -207,24 +203,46 @@ router.get('/', (req, res) => {
  *                 type: number
  *                 format: float
  *                 description: Price of the game
- *               tags:
+ *               image:
  *                 type: string
- *                 description: Comma-separated list of tags
+ *                 format: binary
+ *                 description: Main image for the game
+ *               imageIsLight:
+ *                 type: boolean
+ *                 description: Indicates if the main image is a light version
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *                 description: Logo for the game
+ *               logoIsLight:
+ *                 type: boolean
+ *                 description: Indicates if the logo is a light version
  *     responses:
  *       201:
  *         description: Game successfully uploaded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Game uploaded successfully."
+ *                 game:
+ *                   $ref: '#/components/schemas/Game'
  *       400:
  *         description: Bad request, possibly due to missing image or fields
  *       500:
  *         description: Server error during database operation
  */
-router.post('/', upload.single('image'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
+router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'logo', maxCount: 1 }]), async (req, res) => {
+    if (!req.files || !req.files.image || !req.files.logo) {
+        return res.status(400).json({ error: 'Both image and logo files need to be uploaded.' });
     }
 
-    const { name, description, price, tags } = req.body;
-    const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const { name, description, price, imageIsLight, logoIsLight } = req.body;
+    const imageUrl = `http://localhost:3001/img/${req.files.image[0].filename}`;
+    const logoUrl = `http://localhost:3001/img/${req.files.logo[0].filename}`;
 
     content.beginTransaction(async (err) => {
         if (err) {
@@ -234,35 +252,62 @@ router.post('/', upload.single('image'), async (req, res) => {
 
         try {
             const insertImageQuery = 'INSERT INTO images (path, isLight) VALUES (?, ?)';
-            const [imageResult] = await content.promise().query(insertImageQuery, [imageUrl, 0]);
+            const [imageResult] = await content.promise().query(insertImageQuery, [imageUrl, imageIsLight === 'true']);
+            const [logoResult] = await content.promise().query(insertImageQuery, [logoUrl, logoIsLight === 'true']);
 
             const imageId = imageResult.insertId;
-            const insertGameQuery = 'INSERT INTO games (name, description, price, image) VALUES (?, ?, ?, ?)';
-            const [gameResult] = await content.promise().query(insertGameQuery, [name, description, price, imageId]);
+            const logoId = logoResult.insertId;
+
+            const insertGameQuery = 'INSERT INTO games (name, description, price, image, logo) VALUES (?, ?, ?, ?, ?)';
+            const [gameResult] = await content.promise().query(insertGameQuery, [name, description, price, imageId, logoId]);
 
             const gameId = gameResult.insertId;
 
-            if (tags) {
-                const tagList = tags.split(',').map(tag => tag.trim());
-                for (const tagName of tagList) {
-                    const [tagResult] = await content.promise().query('SELECT id FROM tags WHERE name = ?', [tagName]);
-                    let tagId;
-                    if (tagResult.length === 0) {
-                        const [newTagResult] = await content.promise().query('INSERT INTO tags (name) VALUES (?)', [tagName]);
-                        tagId = newTagResult.insertId;
-                    } else {
-                        tagId = tagResult[0].id;
-                    }
-                    await content.promise().query('INSERT INTO tags_association (idTag, idGame) VALUES (?, ?)', [tagId, gameId]);
-                }
-            }
+            // Retrieve the newly created game to return it using the provided detailed query
+            const query = `
+                SELECT 
+                    games.id, games.name, games.description, games.price, games.url, games.stock,
+                    mainImages.id AS image_id, mainImages.path AS image_path,
+                    mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
+                    logoImages.id AS logo_id, logoImages.path AS logo_path,
+                    logoImages.isLight AS logo_isLight, logoImages.uploadDateTime AS logo_uploadDateTime,
+                    tags.id AS tag_id, tags.name AS tag_name
+                FROM games
+                LEFT JOIN images AS mainImages ON games.image = mainImages.id
+                LEFT JOIN images AS logoImages ON games.logo = logoImages.id
+                LEFT JOIN tags_association ON games.id = tags_association.idGame
+                LEFT JOIN tags ON tags_association.idTag = tags.id
+                WHERE games.id = ?`;
+
+            const [newGameResults] = await content.promise().query(query, [gameId]);
 
             content.commit((err) => {
                 if (err) {
                     console.error('Error during transaction commit:', err);
                     return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(201).json({ message: 'Game uploaded successfully.', gameId: gameId });
+                const gameData = newGameResults.map(game => ({
+                    id: game.id,
+                    name: game.name,
+                    description: game.description,
+                    image: {
+                        id: game.image_id,
+                        path: game.image_path,
+                        isLight: game.image_isLight,
+                        uploadDateTime: game.image_uploadDateTime
+                    },
+                    logo: {
+                        id: game.logo_id,
+                        path: game.logo_path,
+                        isLight: game.logo_isLight,
+                        uploadDateTime: game.logo_uploadDateTime
+                    },
+                    price: game.price,
+                    url: game.url,
+                    stock: game.stock,
+                    tags: game.tag_id ? [{ id: game.tag_id, name: game.tag_name }] : []
+                }))[0];
+                res.status(201).json({ message: 'Game uploaded successfully.', game: gameData });
             });
         } catch (error) {
             content.rollback(() => {
@@ -629,7 +674,7 @@ router.put('/:id/price', (req, res) => {
  * @swagger
  * /games/{id}/tags:
  *   post:
- *     summary: Associate tags with a specific game
+ *     summary: Associate tags with a specific game and return the added tags with their IDs
  *     tags: [Games]
  *     parameters:
  *       - in: path
@@ -652,13 +697,30 @@ router.put('/:id/price', (req, res) => {
  *                 description: List of tags to associate with the game
  *     responses:
  *       200:
- *         description: Tags associated successfully
+ *         description: Tags associated successfully with their IDs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tags associated successfully.
+ *                 tags:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
  *       400:
  *         description: Invalid input
  *       500:
  *         description: Server error
  */
-router.post('/:id/tags', (req, res) => {
+router.post('/:id/tags', async (req, res) => {
     const gameId = req.params.id;
     const { tags } = req.body;
 
@@ -673,9 +735,10 @@ router.post('/:id/tags', (req, res) => {
         }
 
         try {
+            let addedTags = [];
             for (const tagName of tags) {
-                const [tagResult] = await content.promise().query('SELECT id, name FROM tags WHERE name = ?', [tagName]);
                 let tagId;
+                const [tagResult] = await content.promise().query('SELECT id FROM tags WHERE name = ?', [tagName]);
                 if (tagResult.length === 0) {
                     const [newTagResult] = await content.promise().query('INSERT INTO tags (name) VALUES (?)', [tagName]);
                     tagId = newTagResult.insertId;
@@ -683,12 +746,11 @@ router.post('/:id/tags', (req, res) => {
                     tagId = tagResult[0].id;
                 }
 
-                const [tagAssocResult] = await content.promise().query(
-                    'SELECT * FROM tags_association WHERE idTag = ? AND idGame = ?', [tagId, gameId]
+                const [assocResult] = await content.promise().query(
+                    'INSERT IGNORE INTO tags_association (idTag, idGame) VALUES (?, ?)', [tagId, gameId]
                 );
-
-                if (tagAssocResult.length === 0) {
-                    await content.promise().query('INSERT INTO tags_association (idTag, idGame) VALUES (?, ?)', [tagId, gameId]);
+                if (assocResult.insertId || assocResult.affectedRows > 0) {
+                    addedTags.push({ id: tagId, name: tagName });
                 }
             }
 
@@ -697,7 +759,7 @@ router.post('/:id/tags', (req, res) => {
                     console.error('Error during transaction commit:', err);
                     return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(200).json({ message: 'Tags associated successfully.' });
+                res.status(200).json({ message: 'Tags associated successfully.', tags: addedTags });
             });
         } catch (error) {
             content.rollback(() => {

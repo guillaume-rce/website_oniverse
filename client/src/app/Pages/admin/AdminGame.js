@@ -3,9 +3,10 @@ import { CartProvider } from "../../CartContext";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import Multiselect from "multiselect-react-dropdown";
+import { useDropzone } from 'react-dropzone';
 
 import Header from "../../components/Header";
+import CustomMultiselect from "../../components/CustomMultiselect";
 
 const AdminGame = () => {
     var { id } = useParams();
@@ -20,9 +21,31 @@ const AdminGame = () => {
     const [totalRevenueValue, setTotalRevenueValue] = useState(0);
 
     const [addingTags, setAddingTags] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [inputValue, setInputValue] = useState('');
 
     const [allTags, setAllTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+
+    const [editing, setEditing] = useState(false);
+
+    const handleAddTagClick = (event) => {
+        setAddingTags(!addingTags);
+        if (!addingTags) {
+            setMousePosition({
+                x: event.clientX,
+                y: 800
+            });
+            setShowModal(true);
+        }
+    };
+
+    useEffect(() => {
+        if (!addingTags) {
+            setTimeout(() => setShowModal(false), 300);
+        }
+    }, [addingTags]);
 
     useEffect(() => {
         fetch(`http://localhost:3001/games/${id}`)
@@ -160,35 +183,113 @@ const AdminGame = () => {
         return <div>{error}</div>;
     }
 
+    const filteredItems = items.filter((item) => item.isDigital && item.item_id === game.id);
+
+    const orderIds = filteredItems.map(item => item.order_id);
+    const relevantOrders = orders.filter(order => orderIds.includes(order.id));
+    const orderDates = relevantOrders.map(order => new Date(order.creationDateTime));
+
+    const minDate = new Date(Math.min(...orderDates));
+    minDate.setHours(0, 0, 0, 0);
+    const maxDate = new Date(Math.max(...orderDates));
+    maxDate.setHours(23, 59, 59, 999);
+
+    const formatDate = (date) => {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     var data = [];
-    items.forEach((item) => {
-        if (item.isDigital && item.item_id === game.id) {
-            const order = orders.find((order) => order.id === item.order_id);
-            const date = new Date(order.creationDateTime);
-            const day = date.getDate();
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            const key = `${day}/${month}/${year}`;
-            const existing = data.find((d) => d.name === key);
-            const total = item.quantity * game.price;
-            if (existing) {
-                existing.Total = parseFloat(
-                    (existing.Total + total).toFixed(2));
-            } else {
-                data.push({ name: key, Total: parseFloat(total.toFixed(2)) });
-            }
+    for (let d = new Date(minDate); d <= maxDate; d.setDate(d.getDate() + 1)) {
+        data.push({ name: formatDate(new Date(d)), Total: 0 });
+    }
+
+    filteredItems.forEach((item) => {
+        const order = relevantOrders.find((order) => order.id === item.order_id);
+        const date = new Date(order.creationDateTime);
+        date.setHours(0, 0, 0, 0);
+        const key = formatDate(date);
+        const existing = data.find((d) => d.name === key);
+        if (!existing) {
+            console.error(`No data entry found for date ${key}`);
+            return;
+        }
+        const total = item.quantity * game.price;
+        existing.Total = parseFloat((existing.Total + total).toFixed(2));
+    });
+
+
+
+    let tagsOptions = [];
+    allTags.forEach((tag) => {
+        if (!game.tags.some((t) => t.id === tag.id)) {
+            tagsOptions.push({ name: tag.name, value: tag.name, id: tag.id });
         }
     });
 
-    const handleAddTagClick = () => {
-        setAddingTags(!addingTags);
+    // Ajouter les tags sélectionnés à la liste des tags du jeu
+    const handeleSubmit = () => {
+        if (selectedTags.length > 0) {
+            // tags = [ "tag1", "tag2", "tag3" ]
+            const tags = selectedTags.map((tag) => tag.name);
+            if (tags.length > 0) {
+                fetch(`http://localhost:3001/games/${game.id}/tags`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        tags
+                    }),
+                })
+                    .then(
+                        (response) => response.json(),
+                        (error) => {
+                            console.error("Failed to add tags", error);
+                            setError("Failed to add tags");
+                        }
+                    )
+                    .then((data) => {
+                        if (!data) {
+                            console.error("No tags added");
+                            return;
+                        }
 
-        if (addingTags) {
-            setSelectedTags([]);
+                        // ajouter les "tags" à la liste des tags du jeu
+                        console.log(data);
+                        setGame({ ...game, tags: [...game.tags, ...data.tags] });
+
+                    });
+            }
         }
     }
 
-    const tagsOptions = allTags.map((tag) => ({ name: tag.name, value: tag.name, id: tag.id }));
+    const handleDeleteTagClick = (tagId) => {
+        fetch(`http://localhost:3001/tags/${tagId}`, {
+            method: "DELETE",
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error("Failed to delete tag", error);
+                    setError("Failed to delete tag");
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error("No tag deleted");
+                    return;
+                }
+
+                // supprimer le tag de la liste des tags du jeu
+                setGame({
+                    ...game,
+                    tags: game.tags.filter((tag) => tag.id !== tagId),
+                });
+            });
+    }
 
     return (
         <div className="admin-game" ref={ref}>
@@ -196,18 +297,31 @@ const AdminGame = () => {
                 <Header hide={false} />
             </CartProvider>
             <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}
-                className="title">Détails du jeu {game.name}</label>
+                className="title">Détails du jeu</label>
             <div className="admin-game-content">
                 <div className="admin-game-info">
                     <div className="admin-game-present">
-                        <img src={game.image.path} alt={game.name} className="admin-game-image" />
+                        <img src={game.logo ? game.logo.path : game.image.path} alt={game.name} className="admin-game-image" />
                         <div className="admin-game-description">
                             <label className="admin-game-name">{game.name}</label>
                             <label className="admin-game-description">{game.description}</label>
                             <label className="admin-game-price">{game.price} €</label>
                             <label className="admin-game-stock">Stock : {game.stock}</label>
                         </div>
+                        <div className="admin-game-actions">
+                            <div className="admin-game-action" style={{ padding: '10px' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-6 h-6">
+                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                                </svg>
+                            </div>
+                            <div className="admin-game-action" style={{ padding: '5px' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-6 h-6">
+                                    <path d="M19 6H15V4H9V6H5V8H19V6ZM17 10H7L8 18H16L17 10Z" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
+
                     <div className="admin-game-selling">
                         <label className="title" style={{ fontSize: '2em' }}>Ventes</label>
                         <label className="admin-game-sell">
@@ -218,6 +332,7 @@ const AdminGame = () => {
                         <div className="admin-game-sell-value">{totalRevenueValue} €</div>
                     </div>
                 </div>
+
                 <div className="admin-game-reports">
                     <label className="title" style={{ fontSize: '2em' }}>Rapport de ventes</label>
                     <ResponsiveContainer width="100%" height="100%">
@@ -246,6 +361,11 @@ const AdminGame = () => {
                             {game.tags.map((tag) => (
                                 <div key={tag.id} className="admin-game-tag">
                                     <label className="admin-game-tag-label">{tag.name}</label>
+                                    <div className="admin-game-tag-delete" onClick={() => handleDeleteTagClick(tag.id)}>
+                                        <svg className="delete-tag-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" fill="#f00">
+                                            <path d="M19 6H15V4H9V6H5V8H19V6ZM17 10H7L8 18H16L17 10Z" />
+                                        </svg>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -255,38 +375,48 @@ const AdminGame = () => {
                             </svg>
                         </button>
                     </div>
-                    {addingTags && (
-                        <div className={`modal ${addingTags ? 'fade-in' : 'fade-out'}`}>
-                            <Multiselect
-                                options={tagsOptions}
-                                selectedValues={selectedTags}
-                                displayValue="name"
-                                id="tags-select"
-                                className="tags-select"
-                                placeholder="Sélectionner un tag"
-                                onSelect={(selectedList, selectedItem) => { setSelectedTags(selectedList) }}
-                                onRemove={(selectedList, removedItem) => { setSelectedTags(selectedList) }}
-                                style={
-                                    {
-                                        chips: {
-                                            background: '#3f51b5'
-                                        },
-                                        multiselectContainer: {
-                                            color: '#3f51b5',
-                                        },
-                                    }
-                                }
-                            />
+                    {showModal && (
+                        <div className={`modal ${addingTags ? 'fade-in' : 'fade-out'}`} style={{ top: `${mousePosition.y + 250}px`, left: `${mousePosition.x}px` }}>
+                            <label className="modal-title">Ajouter un tag</label>
+                            <div className="modal-input">
+                                <CustomMultiselect
+                                    tagsOptions={allTags.map(tag => ({ name: tag.name, value: tag.name, id: tag.id }))}
+                                    selectedTags={selectedTags}
+                                    setSelectedTags={setSelectedTags}
+                                    setAllTags={setAllTags}
+                                    allTags={allTags}
+                                />
+                                <button className="modal-button-submit" onClick={() => handeleSubmit()}>Ajouter</button>
+                            </div>
                         </div>
                     )}
                 </div>
-
-                <div className="admin-game-actions">
-                    <label className="title" style={{ fontSize: '2em' }}>Actions</label>
-                    <div className="admin-game-actions-list">
-                        <button className="admin-game-action">Modifier</button>
-                        <button className="admin-game-action">Supprimer</button>
+            </div>
+            
+            <div className="admin-game-edit">
+                <div className="admin-game-edit-container">
+                    <label className="title" style={{ fontSize: '2em' }}>Modifier le jeu</label>
+                    <div className="admin-game-edit-input">
+                        <label className="admin-game-edit-label">Nom</label>
+                        <input type="text" className="admin-game-edit-input" value={game.name} />
                     </div>
+                    <div className="admin-game-edit-input">
+                        <label className="admin-game-edit-label">Description</label>
+                        <textarea className="admin-game-edit-input" value={game.description} />
+                    </div>
+                    <div className="admin-game-edit-input">
+                        <label className="admin-game-edit-label">Prix</label>
+                        <input type="number" className="admin-game-edit-input" value={game.price} />
+                    </div>
+                    <div className="admin-game-edit-input">
+                        <label className="admin-game-edit-label">Stock</label>
+                        <input type="number" className="admin-game-edit-input" value={game.stock} />
+                    </div>
+                    <div className="admin-game-edit-input">
+                        <label className="admin-game-edit-label">URL du jeu</label>
+                        <input type="text" className="admin-game-edit-input" value={game.url} />
+                    </div>
+                    
                 </div>
             </div>
         </div>

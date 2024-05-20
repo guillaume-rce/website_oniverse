@@ -15,9 +15,10 @@ function ShoppingCart() {
             {
                 cart.length === 0 ? (
                     <p className="shopping-cart-empty">Votre panier est vide</p>
-                ) : <ul className="shopping-cart-list">
+                ) : <div className="shopping-cart-list">
                     {cart.map((game, index) => (
-                        <li key={index} className="shopping-cart-list-item">
+                        <div key={index} className="shopping-cart-list-item">
+                            <img src={game.logo? game.logo.path : game.image.path} alt={game.name} className="shopping-cart-list-item-image" />
                             <div className="shopping-cart-list-item-container">
                                 <span className="shopping-cart-list-item-title">{game.name}</span>
                                 <div className="shopping-cart-list-item-quantity">
@@ -30,9 +31,9 @@ function ShoppingCart() {
                                 className="shopping-cart-list-item-rm"
                                 onClick={() => removeFromCart(game.name)}
                             />
-                        </li>
+                        </div>
                     ))}
-                </ul>
+                </div>
             }
             <p className="shopping-cart-total">Total : {totalPrice}€</p>
             <button className="shopping-cart-view-cart"

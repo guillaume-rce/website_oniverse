@@ -199,6 +199,19 @@
     color: #000;
 }
 
+.admin-game-tag-delete {
+    cursor: pointer;
+    position: relative;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.admin-game-tag-delete:hover {
+    transform: scale(1.1);
+}
+
 .add-tag {
     width: 50px;
     height: 50px;
@@ -225,4 +238,133 @@
 
 .add-tag-icon.cross {
     transform: rotate(45deg);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+     
+    position: absolute;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+.fade-in {
+    animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.fade-out {
+    animation: fadeOutDown 0.3s ease-out forwards;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.modal-input {
+    margin-top: 10px;
+}
+
+.modal-button-submit {
+    margin-top: 20px;
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    background-color: #e69005;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: none;
+}
+
+.admin-game-action-button:hover {
+    background-color: #f5a623;
+}
+
+.admin-game-actions {
+    position: relative;
+    top: -105px;
+    right: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-game-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid #555;
+
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.admin-game-action:hover {
+    background-color: #ddd;
+}
+
+.admin-game-edit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.admin-game-edit-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 20px;
+    width: 80%;
+    height: 80%;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #f5f5f5;
 }

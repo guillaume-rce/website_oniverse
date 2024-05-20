@@ -15,7 +15,7 @@ const DeliveryMethods = ({ deliveryMethods }) => {
         if (!adding) { // Only adjust position and show modal if we are opening
             setMousePosition({
                 x: event.clientX,
-                y: event.clientY
+                y: 980
             });
             setShowModal(true);
         }
@@ -71,7 +71,7 @@ const DeliveryMethods = ({ deliveryMethods }) => {
                     </svg>
                 </button>
                 {showModal && (
-                    <div className={`modal ${adding ? 'fade-in' : 'fade-out'}`} style={{ top: `${mousePosition.y - 130}px`, left: `${mousePosition.x}px` }}>
+                    <div className={`modal ${adding ? 'fade-in' : 'fade-out'}`} style={{ top: `${mousePosition.y}px`, left: `${mousePosition.x}px` }}>
                         <form onSubmit={handleSubmit} className="modal-content">
                             <input type="text" placeholder="Nom de la méthode" value={name} onChange={e => setName(e.target.value)} required />
                             <input type="number" placeholder="Prix" step="0.1" value={price} onChange={e => setPrice(e.target.value)} required />

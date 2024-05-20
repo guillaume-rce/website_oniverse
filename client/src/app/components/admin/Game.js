@@ -5,7 +5,6 @@ const Game = ({ game }) => {
     const [price, setPrice] = useState(game.price);
 
     const handleStock = (id, stock) => {
-        // Cast stock to number
         stock = parseInt(stock);
         setStock(stock);
 
@@ -54,7 +53,7 @@ const Game = ({ game }) => {
     }
 
     return (
-        <div key={game.id} className="report-game" onClick={() => window.location.href = `/admin/games/${game.id}`}>
+        <div key={game.id} className="report-game">
             <img src={game.image.path} alt={game.name} className="game-image" />
             <label className="game-name">{game.name}</label>
             <div>
@@ -67,6 +66,7 @@ const Game = ({ game }) => {
                 <input type="number" className="game-input" value={parseFloat(price)} step={0.1}
                     onChange={(e) => handlePrice(game.id, e.target.value)} />
             </div>
+            <button className="game-page-button" onClick={() => window.location.href = `/admin/games/${game.id}`}>Voir le jeu</button>
         </div>
     );
 }

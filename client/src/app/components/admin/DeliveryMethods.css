@@ -109,7 +109,7 @@
 }
 
 .modal {
-    position: fixed;
+    position: absolute;
     background-color: white;
     padding: 20px;
     border-radius: 8px;
