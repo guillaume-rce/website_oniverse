@@ -1,0 +1,23 @@
+.image-game-edit {
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+}
+
+.image-game-edit-change {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.image-game-edit-change-img {
+    height: 20%;
+    filter: invert(1);
+}

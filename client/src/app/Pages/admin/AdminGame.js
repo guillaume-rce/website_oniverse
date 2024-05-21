@@ -3,10 +3,10 @@ import { CartProvider } from "../../CartContext";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { useDropzone } from 'react-dropzone';
 
 import Header from "../../components/Header";
 import CustomMultiselect from "../../components/CustomMultiselect";
+import GameImageEdit from "../../components/admin/GameImageEdit";
 
 const AdminGame = () => {
     var { id } = useParams();
@@ -28,7 +28,15 @@ const AdminGame = () => {
     const [allTags, setAllTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
 
+    // ---- For editing zone
     const [editing, setEditing] = useState(false);
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [price, setPrice] = useState(0);
+    const [stock, setStock] = useState(0);
+    const [url, setUrl] = useState('');
+
+    // ---- For tags zone
 
     const handleAddTagClick = (event) => {
         setAddingTags(!addingTags);
@@ -63,6 +71,12 @@ const AdminGame = () => {
                 }
 
                 setGame(data);
+
+                setName(data.name);
+                setDescription(data.description);
+                setPrice(data.price);
+                setStock(data.stock);
+                setUrl(data.url);
             });
 
         fetch("http://localhost:3001/orders/items")
@@ -309,7 +323,7 @@ const AdminGame = () => {
                             <label className="admin-game-stock">Stock : {game.stock}</label>
                         </div>
                         <div className="admin-game-actions">
-                            <div className="admin-game-action" style={{ padding: '10px' }}>
+                            <div className="admin-game-action" style={{ padding: '10px' }} onClick={() => setEditing(!editing)}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-6 h-6">
                                     <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                                 </svg>
@@ -392,33 +406,58 @@ const AdminGame = () => {
                     )}
                 </div>
             </div>
-            
+            { editing && (
             <div className="admin-game-edit">
                 <div className="admin-game-edit-container">
                     <label className="title" style={{ fontSize: '2em' }}>Modifier le jeu</label>
-                    <div className="admin-game-edit-input">
-                        <label className="admin-game-edit-label">Nom</label>
-                        <input type="text" className="admin-game-edit-input" value={game.name} />
+                    <div className="admin-game-edit-content">
+                        <div className="admin-game-edit-input-body">
+                            <div className="admin-game-edit-input-container">
+                                <label className="admin-game-edit-label">Nom</label>
+                                <div className="admin-game-edit-input-separator"></div>
+                                <input type="text" className="admin-game-edit-input" value={name}
+                                    onChange={(event) => setName(event.target.value)} />
+                            </div>
+                            <div className="admin-game-edit-input-container">
+                                <label className="admin-game-edit-label">Description</label>
+                                <div className="admin-game-edit-input-separator"></div>
+                                <textarea className="admin-game-edit-input desc" value={description}
+                                    onChange={(event) => setDescription(event.target.value)} />
+                            </div>
+                            <div className="admin-game-edit-input-container">
+                                <label className="admin-game-edit-label">Prix</label>
+                                <div className="admin-game-edit-input-separator"></div>
+                                <input type="number" className="admin-game-edit-input" value={price}
+                                    onChange={(event) => setPrice(event.target.value)} />
+                            </div>
+                            <div className="admin-game-edit-input-container">
+                                <label className="admin-game-edit-label">Stock</label>
+                                <div className="admin-game-edit-input-separator"></div>
+                                <input type="number" className="admin-game-edit-input" value={stock}
+                                    onChange={(event) => setStock(event.target.value)} />
+                            </div>
+                            <div className="admin-game-edit-input-container">
+                                <label className="admin-game-edit-label">URL du jeu</label>
+                                <div className="admin-game-edit-input-separator"></div>
+                                <input type="text" className="admin-game-edit-input" value={url}
+                                    onChange={(event) => setUrl(event.target.value)} />
+                            </div>
+                        </div>
+                        <div className="admin-game-edit-images-container">
+                            <label className="admin-game-edit-label">Image</label>
+                            <div className="admin-game-edit-image-container">
+                                <GameImageEdit gameImage={game.image ? game.image.path : null} onFileReady={(file) => console.log(file)} />
+                            </div>
+                            <div className="admin-game-edit-image-separator"></div>
+                            <label className="admin-game-edit-label">Logo</label>
+                            <div className="admin-game-edit-image-container">
+                                <GameImageEdit gameImage={game.logo ? game.logo.path : null} onFileReady={(file) => console.log(file)} />
+                            </div>
+                        </div>
                     </div>
-                    <div className="admin-game-edit-input">
-                        <label className="admin-game-edit-label">Description</label>
-                        <textarea className="admin-game-edit-input" value={game.description} />
-                    </div>
-                    <div className="admin-game-edit-input">
-                        <label className="admin-game-edit-label">Prix</label>
-                        <input type="number" className="admin-game-edit-input" value={game.price} />
-                    </div>
-                    <div className="admin-game-edit-input">
-                        <label className="admin-game-edit-label">Stock</label>
-                        <input type="number" className="admin-game-edit-input" value={game.stock} />
-                    </div>
-                    <div className="admin-game-edit-input">
-                        <label className="admin-game-edit-label">URL du jeu</label>
-                        <input type="text" className="admin-game-edit-input" value={game.url} />
-                    </div>
-                    
                 </div>
             </div>
+            )}
         </div>
     );
 };
