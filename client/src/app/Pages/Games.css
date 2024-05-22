@@ -57,17 +57,19 @@
     height: 32px;
 }
 
-.sort-icon {
+.arrow-asc, .arrow-desc {
     transition: transform 0.3s ease-in-out;
+    transform-origin: center;
 }
 
-.sort-asc {
+.arrow-asc {
     transform: rotate(0deg);
 }
 
-.sort-desc {
+.arrow-desc {
     transform: rotate(180deg);
 }
+
 
 .no-games {
     font-size: 1.5em;
