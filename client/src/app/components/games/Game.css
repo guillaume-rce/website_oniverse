@@ -13,17 +13,76 @@
     cursor: pointer;
 }
 
-.game-card * {
+.game-card-component * {
     cursor: pointer;
 }
 
-.game-card:hover {
+.game-card-component:hover {
     transform: scale(1.02);
-    opacity: 0.8;
 }
 
-.game-image {
+.game-image-component {
     height: 100%;
-    ratio: 1/1;
+    aspect-ratio: 1/1;
+    object-fit: cover;
     border-radius: 5px;
+}
+
+.game-info-component {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px;
+    margin-left: 10px;
+}
+
+.game-name-component {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.game-price-component {
+    font-size: 1.5rem;
+}
+
+.game-add-component {
+    /* this is the button */
+    height: 100%;
+    aspect-ratio: 1/1;
+
+    border-radius: 5px;
+    background-color: #e69005;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-add-component:hover {
+    background-color: #ff9e00;
+}
+
+.game-add-component.added-to-cart {
+    background-color: #f8c064;
+}
+
+.game-tags-component {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.game-tag-component {
+    padding: 3px 15px;
+    border-radius: 20px;
+    border: 1px solid #e69005;
+    font-size: 1.2em;
 }
