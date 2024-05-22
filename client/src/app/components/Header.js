@@ -21,6 +21,10 @@ function Header(props) {
             const scrollDistance = document.documentElement.scrollTop || document.body.scrollTop;
             const newOpacity = Math.min(1, scrollDistance / 100);
             setOpacity(newOpacity);
+            if (newOpacity === 0) {
+                setCartVisible(false);
+                setProfileVisible(false);
+            }
         };
         window.addEventListener('scroll', handleScroll);
 
@@ -52,24 +56,30 @@ function Header(props) {
     };
 
     return (
-        <header className='header' style={(props.hide ? { opacity } : {})}>
-            <img src={logo} alt="Logo" className='header_logo' />
-            <ul className='header_nav'>
-                <li className='header_nav_item'><Link to='/'>Home</Link></li>
-                <li className='header_nav_item'><a href='#games'>Games</a></li>
-                <li className='header_nav_item'><a href='#news'>News</a></li>
-                <li className='header_nav_item'><a href='#about'>About</a></li>
-            </ul>
-            <button className='header_cart' onClick={toggleCart}>
-                <img src={shoppingCart} alt="Shopping cart" className='header_cart_img' />
-            </button>
-            <div className='header_profile'>
-                <img src={profileImage || defaultProfileImage} alt="Profile" className='header_profile_img'
-                    onClick={() => userId ? toggleProfile() : window.location.href = '/auth'} />
-            </div>
-            {isProfileVisible && <ProfileCart />}
-            {isCartVisible && <ShippingCart />}
-        </header>
+        <div className='header_container'>
+            {opacity !== 0 ? (
+                <header className='header' style={(props.hide ? { opacity } : {})} >
+                    <img src={logo} alt="Logo" className='header_logo' />
+                    <ul className='header_nav'>
+                        <li className='header_nav_item'><Link to='/'>Home</Link></li>
+                        <li className='header_nav_item'><a href='#games'>Games</a></li>
+                        <li className='header_nav_item'><a href='#news'>News</a></li>
+                        <li className='header_nav_item'><a href='#about'>About</a></li>
+                    </ul>
+                    <button className='header_cart' onClick={toggleCart}>
+                        <img src={shoppingCart} alt="Shopping cart" className='header_cart_img' />
+                    </button>
+                    <div className='header_profile'>
+                        <img src={profileImage || defaultProfileImage} alt="Profile" className='header_profile_img'
+                            onClick={() => userId ? toggleProfile() : window.location.href = '/auth'} />
+                    </div>
+                    {isProfileVisible && <ProfileCart />}
+                    {isCartVisible && <ShippingCart />}
+                </header>
+            ) : (
+                null
+            )}
+        </div>
     );
 }
 

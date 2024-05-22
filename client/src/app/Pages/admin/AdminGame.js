@@ -189,6 +189,9 @@ const AdminGame = () => {
         window.requestAnimationFrame(step);
     }
 
+    const [isLogoLight, setIsLogoLight] = useState(game?.logo?.isLight);
+    const [isImageLight, setIsImageLight] = useState(game?.image?.isLight);
+
     if (!game || !items || !orders) {
         return <div>Loading...</div>;
     }
@@ -349,6 +352,81 @@ const AdminGame = () => {
             });
     }
 
+    const updateImage = (image) => {
+        // Send image in a form data
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("isLight", isImageLight);
+
+        fetch(`http://localhost:3001/games/update-image/${game.id}`, {
+            method: "PUT",
+            body: formData,
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error("Failed to update image", error);
+                    setError("Failed to update image");
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error("No image updated");
+                    return;
+                }
+
+                game.image = data.image;
+            });
+    }
+
+    const updateLogo = (logo) => {
+        // Send logo in a form data
+        const formData = new FormData();
+        formData.append("logo", logo);
+        formData.append("isLight", isLogoLight);
+
+        fetch(`http://localhost:3001/games/update-logo/${game.id}`, {
+            method: "PUT",
+            body: formData,
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error("Failed to update logo", error);
+                    setError("Failed to update logo");
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error("No logo updated");
+                    return;
+                }
+
+                game.logo = data.logo;
+            });
+    }
+
+    const suppressGame = () => {
+        fetch(`http://localhost:3001/games/${game.id}`, {
+            method: "DELETE",
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error("Failed to delete game", error);
+                    setError("Failed to delete game");
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error("No game deleted");
+                    return;
+                }
+
+                window.location.href = "/admin/games";
+            });
+    }
+
     return (
         <div className="admin-game" ref={ref}>
             <CartProvider>
@@ -364,12 +442,14 @@ const AdminGame = () => {
                             <div className="admin-game-name-container">
                                 <label className="admin-game-name">{game.name}</label>
                                 <div className="admin-game-actions">
-                                    <div className="admin-game-action" style={{ padding: '10px' }} onClick={() => setEditing(!editing)}>
+                                    <div className="admin-game-action" style={{ padding: '10px' }}
+                                        onClick={() => setEditing(!editing)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-6 h-6">
                                             <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                                         </svg>
                                     </div>
-                                    <div className="admin-game-action" style={{ padding: '5px' }}>
+                                    <div className="admin-game-action" style={{ padding: '5px' }}
+                                        onClick={suppressGame}>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" class="w-6 h-6">
                                             <path d="M19 6H15V4H9V6H5V8H19V6ZM17 10H7L8 18H16L17 10Z" />
                                         </svg>
@@ -495,12 +575,27 @@ const AdminGame = () => {
                             <div className="admin-game-edit-images-container">
                                 <label className="admin-game-edit-image-label">Image</label>
                                 <div className="admin-game-edit-image-container">
-                                    <GameImageEdit gameImage={game.image ? game.image.path : null} onFileReady={(file) => console.log(file)} />
+                                    <GameImageEdit gameImage={game.image ? game.image.path : null}
+                                        onFileReady={updateImage} />
+                                </div>
+                                <div className="admin-game-edit-checkbox-container">
+                                    <input type="checkbox" id="imageLight" name="imageLight"
+                                        value={isImageLight} className="admin-game-edit-checkbox"
+                                        onChange={(event) => setIsImageLight(event.target.checked)} />
+                                    <label className="admin-game-edit-checkbox-label"
+                                        for="imageLight">Is image light</label>
                                 </div>
                                 <div className="admin-game-edit-image-separator"></div>
                                 <label className="admin-game-edit-image-label">Logo</label>
                                 <div className="admin-game-edit-image-container">
-                                    <GameImageEdit gameImage={game.logo ? game.logo.path : null} onFileReady={(file) => console.log(file)} />
+                                    <GameImageEdit gameImage={game.logo ? game.logo.path : null}
+                                        onFileReady={updateLogo} />
+                                </div>
+                                <div className="admin-game-edit-checkbox-container">
+                                    <input type="checkbox" id="logoLight" name="logoLight"
+                                        value={isLogoLight} className="admin-game-edit-checkbox"
+                                        onChange={(event) => setIsLogoLight(event.target.checked)} />
+                                    <label className="admin-game-edit-checkbox-label" for="logoLight">Is logo light</label>
                                 </div>
                             </div>
                         </div>

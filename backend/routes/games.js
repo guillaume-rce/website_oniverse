@@ -342,9 +342,26 @@ router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'logo', 
  *                 type: string
  *                 format: binary
  *                 description: New main image for the game
+ *               isLight:
+ *                 type: boolean
+ *                 description: Flag indicating if the image is a light version
  *     responses:
  *       200:
  *         description: Main image updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 path:
+ *                   type: string
+ *                 isLight:
+ *                   type: boolean
+ *                 uploadDateTime:
+ *                   type: string
+ *                   format: date-time
  *       400:
  *         description: No file uploaded
  *       500:
@@ -357,6 +374,7 @@ router.put('/update-image/:id', upload.single('image'), async (req, res) => {
 
     const gameId = req.params.id;
     const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const isLight = req.body.isLight === 'true';
 
     content.beginTransaction(async (err) => {
         if (err) {
@@ -366,18 +384,21 @@ router.put('/update-image/:id', upload.single('image'), async (req, res) => {
 
         try {
             const insertImageQuery = 'INSERT INTO images (path, isLight) VALUES (?, ?)';
-            const [imageResult] = await content.promise().query(insertImageQuery, [imageUrl, 0]);
+            const [imageResult] = await content.promise().query(insertImageQuery, [imageUrl, isLight]);
 
             const imageId = imageResult.insertId;
             const updateGameQuery = 'UPDATE games SET image = ? WHERE id = ?';
             await content.promise().query(updateGameQuery, [imageId, gameId]);
+
+            const query = 'SELECT id, path, isLight, uploadDateTime FROM images WHERE id = ?';
+            const [updatedImage] = await content.promise().query(query, [imageId]);
 
             content.commit((err) => {
                 if (err) {
                     console.error('Error during transaction commit:', err);
                     return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(200).json({ message: 'Game image updated successfully.', imageUrl: imageUrl });
+                res.status(200).json(updatedImage[0]);
             });
         } catch (error) {
             content.rollback(() => {
@@ -412,9 +433,26 @@ router.put('/update-image/:id', upload.single('image'), async (req, res) => {
  *                 type: string
  *                 format: binary
  *                 description: New logo for the game
+ *               isLight:
+ *                 type: boolean
+ *                 description: Flag indicating if the logo is a light version
  *     responses:
  *       200:
  *         description: Game logo updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 path:
+ *                   type: string
+ *                 isLight:
+ *                   type: boolean
+ *                 uploadDateTime:
+ *                   type: string
+ *                   format: date-time
  *       400:
  *         description: No file uploaded
  *       500:
@@ -427,6 +465,7 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
 
     const gameId = req.params.id;
     const logoUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const isLight = req.body.isLight === 'true';
 
     content.beginTransaction(async (err) => {
         if (err) {
@@ -436,18 +475,21 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
 
         try {
             const insertLogoQuery = 'INSERT INTO images (path, isLight) VALUES (?, ?)';
-            const [logoResult] = await content.promise().query(insertLogoQuery, [logoUrl, 0]);
+            const [logoResult] = await content.promise().query(insertLogoQuery, [logoUrl, isLight]);
 
             const logoId = logoResult.insertId;
             const updateGameQuery = 'UPDATE games SET logo = ? WHERE id = ?';
             await content.promise().query(updateGameQuery, [logoId, gameId]);
+
+            const query = 'SELECT id, path, isLight, uploadDateTime FROM images WHERE id = ?';
+            const [updatedLogo] = await content.promise().query(query, [logoId]);
 
             content.commit((err) => {
                 if (err) {
                     console.error('Error during transaction commit:', err);
                     return res.status(500).json({ error: 'Server error during transaction commit.' });
                 }
-                res.status(200).json({ message: 'Game logo updated successfully.', logoUrl: logoUrl });
+                res.status(200).json(updatedLogo[0]);
             });
         } catch (error) {
             content.rollback(() => {
@@ -670,6 +712,68 @@ router.put('/:id', async (req, res) => {
     } catch (error) {
         console.error('Error during UPDATE query:', error);
         res.status(500).json({ error: 'Server error during UPDATE query.' });
+    }
+});
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   delete:
+ *     summary: Delete a game by its ID, ensuring it has not been ordered
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           description: The ID of the game to delete
+ *     responses:
+ *       200:
+ *         description: Game deleted successfully
+ *       400:
+ *         description: Game cannot be deleted because it has been ordered
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Server error during the deletion process
+ */
+router.delete('/:id', async (req, res) => {
+    const gameId = req.params.id;
+
+    try {
+        // Connect to the internal_data database to check if the game is part of any orders
+        const internalDataConnection = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'root',
+            database: 'internal_data',
+        });
+
+        const orderCheckQuery = `SELECT 1 FROM order_item WHERE item_id = ? LIMIT 1;`;
+        const [orderExists] = await internalDataConnection.promise().query(orderCheckQuery, [gameId]);
+
+        if (orderExists.length > 0) {
+            // If the game is part of an order, prevent deletion
+            res.status(400).json({ error: 'Game cannot be deleted because it has been ordered.' });
+        } else {
+            // Connect back to the content database to delete the game
+            const deleteGameQuery = `DELETE FROM games WHERE id = ?;`;
+            const [deleteResult] = await content.promise().query(deleteGameQuery, [gameId]);
+
+            if (deleteResult.affectedRows > 0) {
+                res.status(200).json({ message: 'Game deleted successfully.' });
+            } else {
+                res.status(404).json({ error: 'Game not found.' });
+            }
+        }
+
+        // Close the internal_data connection if no longer needed
+        internalDataConnection.end();
+
+    } catch (error) {
+        console.error('Error during the deletion process:', error);
+        res.status(500).json({ error: 'Server error during the deletion process.' });
     }
 });
 

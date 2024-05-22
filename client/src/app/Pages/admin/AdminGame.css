@@ -82,7 +82,7 @@
 .admin-game-name-container {
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
     gap: 10px;
     width: 100%;
@@ -536,4 +536,28 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.admin-game-edit-checkbox-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 20px;
+    cursor: pointer;
+}
+
+.admin-game-edit-checkbox-container * {
+    cursor: pointer;
+}
+
+.admin-game-edit-checkbox {
+    width: 20px;
+    height: 20px;
+}
+.admin-game-edit-checkbox-label {
+    font-size: 1.2rem;
+    color: #000;
 }
