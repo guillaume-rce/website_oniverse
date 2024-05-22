@@ -22,7 +22,7 @@ function AllGames() {
 
     return (
         <div className="AllGames">
-            <h1 className="AllGames_title">Nous jeux</h1>
+            <label className="AllGames_title">Nous jeux</label>
             <div className="AllGames_container">
                 {games.map((game, index) => (
                     <GameCard c_game={game} key={index} />

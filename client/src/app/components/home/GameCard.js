@@ -13,7 +13,7 @@ function GameCard(props) {
     const { name, id, price, image } = game;
     const image_path = image && image["path"];
     return (
-        <div className="game-card">
+        <div className="home-game-card">
             <h2 className="game-card-title">{name}</h2>
             <img src={image_path} alt={name} className="game-card-image" />
             <div className="game-card-buy">

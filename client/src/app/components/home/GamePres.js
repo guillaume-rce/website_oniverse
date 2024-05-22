@@ -25,7 +25,7 @@ function GamePres() {
     }
 
     const { name, id, image } = games[activeIndex];
-    const isLight = image && image["isLight"];
+    const isLight = image?.isLight;
     const titleColor = isLight ? 'black' : 'white';
     const invertValue = isLight ? 'invert(0)' : 'invert(1)';
 
@@ -38,7 +38,7 @@ function GamePres() {
                 </button>
             )}
             <div className="GamePres_overlay">
-                <p className="GamePres_title" style={{ color: titleColor }}>{name}</p>
+                <label className="GamePres_title" style={{ color: titleColor }}>{name}</label>
                 <Link to={`/detail/${id}`} className="GamePres_button" style={{ color: titleColor }}>En savoir plus</Link>
             </div>
             {(games.length > 1) && (
