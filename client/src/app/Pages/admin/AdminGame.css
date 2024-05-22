@@ -53,20 +53,59 @@
     border-radius: 5px;
 }
 
-.admin-game-description {
+.admin-game-description-container {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    align-items: start;
-    gap: 5px;
+    align-content: stretch;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    gap: 10px;
+}
+
+.admin-game-description {
+    width: 100%;
+    height: 100%;
+
+    text-overflow: ellipsis;
+    word-break: break-word;
+    hyphens: auto;
+
+    overflow-y: auto;
+
+    text-wrap: wrap;
+    scrollbar-width: thin;
+    scrollbar-color: #e69005 #0000;
+}
+
+.admin-game-name-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
 }
 
 .admin-game-name {
     font-size: 3rem;
     font-weight: bold;
     color: #000;
+
+    /* pas de retour à la ligne */
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e69005 #0000;
+}
+
+.admin-game-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 .admin-game-description {
@@ -78,11 +117,13 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: #000;
+    width: 100%;
 }
 
 .admin-game-stock {
     font-size: 1.5rem;
     color: #555;
+    width: 100%;
 }
 
 .admin-game-selling {
@@ -310,17 +351,6 @@
     background-color: #f5a623;
 }
 
-.admin-game-actions {
-    position: relative;
-    top: -105px;
-    right: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}
-
 .admin-game-action {
     display: flex;
     justify-content: center;
@@ -417,7 +447,7 @@
     height: 100%;
     border: none;
     background-color: transparent;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .admin-game-edit-input.desc {
@@ -426,9 +456,36 @@
     resize: none;
 }
 
+.admin-game-edit-save-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-game-edit-save {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-size-adjust: 0.58;
+    font-size: 2rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s;
+}
+
+.admin-game-edit-save:hover {
+    background-color: #45a049;
+}
+
 .admin-game-edit-input-separator {
     height: 100%;
     width: 1px;
+    min-width: 1px;
     background-color: #000;
 }
 
@@ -464,6 +521,19 @@
 
 .admin-game-edit-image-separator {
     height: 1px;
+    min-height: 1px;
     width: 100%;
     background-color: #000;
+}
+
+.admin-game-edit-image-label {
+    font-size: 1.5rem;
+    color: #000;
+    width: 100%;
+    height: 85px;
+    min-height: 35px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

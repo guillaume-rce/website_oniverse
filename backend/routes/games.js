@@ -543,6 +543,138 @@ router.get('/:id', (req, res) => {
 
 /**
  * @swagger
+ * /games/{id}:
+ *   put:
+ *     summary: Update specific fields of a game
+ *     tags:
+ *       - Games
+ *     description: Updates specific fields of a game identified by its ID. Fields not provided will not be updated.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the game
+ *               description:
+ *                 type: string
+ *                 description: Detailed description of the game
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Selling price of the game
+ *               stock:
+ *                 type: integer
+ *                 description: Current stock quantity of the game
+ *               url:
+ *                 type: string
+ *                 description: Official URL for the game
+ *     responses:
+ *       200:
+ *         description: Game successfully updated and returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Game updated successfully."
+ *                 game:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                     stock:
+ *                       type: integer
+ *                     url:
+ *                       type: string
+ *       400:
+ *         description: No valid fields provided for update or input validation fails
+ *       404:
+ *         description: Game not found with the given ID
+ *       500:
+ *         description: Server error during the update process
+ */
+router.put('/:id', async (req, res) => {
+    const { name, description, price, stock, url } = req.body;
+    const gameId = req.params.id;
+
+    let updateParts = [];
+    let values = [];
+
+    if (name && typeof name === 'string' && name.length > 0) {
+        updateParts.push("name = ?");
+        values.push(name);
+    }
+    if (description && typeof description === 'string' && description.length > 0) {
+        updateParts.push("description = ?");
+        values.push(description);
+    }
+    if (price !== undefined && !isNaN(price)) {
+        updateParts.push("price = ?");
+        values.push(price);
+    }
+    if (stock !== undefined && !isNaN(stock) && stock >= 0) {
+        updateParts.push("stock = ?");
+        values.push(stock);
+    }
+    if (url && typeof url === 'string' && url.length > 0) {
+        updateParts.push("url = ?");
+        values.push(url);
+    }
+
+    if (updateParts.length === 0) {
+        return res.status(400).json({ error: 'No valid fields provided for update.' });
+    }
+
+    const updateQuery = `UPDATE games SET ${updateParts.join(", ")} WHERE id = ?;`;
+    values.push(gameId);
+
+    try {
+        const [updateResults] = await content.promise().query(updateQuery, values);
+        if (updateResults.affectedRows === 0) {
+            return res.status(404).json({ error: 'Game not found.' });
+        }
+
+        // Retrieve updated game details
+        const selectQuery = `SELECT id, name, description, price, stock, url FROM games WHERE id = ?;`;
+        const [selectResults] = await content.promise().query(selectQuery, [gameId]);
+        if (selectResults.length === 0) {
+            return res.status(404).json({ error: 'Game not found after update.' });
+        }
+
+        const updatedGame = selectResults[0];
+        res.json({
+            message: 'Game updated successfully.',
+            game: updatedGame
+        });
+
+    } catch (error) {
+        console.error('Error during UPDATE query:', error);
+        res.status(500).json({ error: 'Server error during UPDATE query.' });
+    }
+});
+
+/**
+ * @swagger
  * /games/{id}/stock:
  *   put:
  *     summary: Update the stock for a specified game
