@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Order from '../../components/admin/Order';
 import './AdminOrders.css';
-import { CartProvider } from '../../CartContext';
 import Header from '../../components/Header';
 
 const AdminOrders = () => {
@@ -33,9 +32,7 @@ const AdminOrders = () => {
 
     return (
         <div className="admin-orders">
-            <CartProvider>
-                <Header hide={false} />
-            </CartProvider>
+            <Header hide={false} />
             <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}
                 className="title">Toutes les commandes</label>
             <div className="orders">

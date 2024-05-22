@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 
 import './AdminOrder.css';
-import { CartProvider } from '../../CartContext';
 import Header from '../../components/Header';
 
 import React, { PureComponent } from 'react';
@@ -226,9 +225,7 @@ const AdminOrder = () => {
 
     return (
         <div className="admin-order" ref={ref}>
-            <CartProvider>
-                <Header hide={false} />
-            </CartProvider>
+            <Header hide={false} />
             <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }} className="title">Order</label>
             <div className="order-header">
                 <label className="admin-order-id">Order ID: #{order.id}</label>

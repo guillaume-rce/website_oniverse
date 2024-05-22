@@ -1,0 +1,29 @@
+.game-card-component {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+    box-sizing: border-box;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.game-card * {
+    cursor: pointer;
+}
+
+.game-card:hover {
+    transform: scale(1.02);
+    opacity: 0.8;
+}
+
+.game-image {
+    height: 100%;
+    ratio: 1/1;
+    border-radius: 5px;
+}

@@ -1,5 +1,4 @@
 import "./AdminGame.css";
-import { CartProvider } from "../../CartContext";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -429,9 +428,7 @@ const AdminGame = () => {
 
     return (
         <div className="admin-game" ref={ref}>
-            <CartProvider>
-                <Header hide={false} />
-            </CartProvider>
+            <Header hide={false} />
             <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}
                 className="title">Détails du jeu #{game.id}</label>
             <div className="admin-game-content">

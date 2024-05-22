@@ -6,7 +6,6 @@ import Games from '../components/admin/Games';
 import DeliveryMethods from '../components/admin/DeliveryMethods';
 import Info from '../components/admin/Info';
 import Users from '../components/admin/Users';
-import { CartProvider } from '../CartContext';
 
 import './Admin.css';
 
@@ -150,9 +149,7 @@ const Admin = () => {
 
     return (
         <div className="admin">
-            <CartProvider>
-                <Header hide={false} />
-            </CartProvider>
+            <Header hide={false} />
             <div className="dashboard">
                 <div className="welcome">
                     <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}>Welcome back to your dashboard, {user.pseudo}!</label>

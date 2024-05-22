@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Game from '../../components/admin/Game';
-import { CartProvider } from '../../CartContext';
 import Header from '../../components/Header';
 import './AdminGames.css';
 
@@ -37,9 +36,7 @@ const AdminGames = () => {
 
     return (
         <div className="admin-games">
-            <CartProvider>
-                <Header hide={false} />
-            </CartProvider>
+            <Header hide={false} />
             <label style={{ fontSize: '3em', color: '#fff', fontWeight: 'bold' }}
                 className="title">Tous les jeux</label>
             <div className="games">

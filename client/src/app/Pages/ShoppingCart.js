@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import './ShoppingCart.css';
-import { CartProvider } from '../CartContext';
 import ItemsCart from '../components/shopping_cart/ItemsCart';
 import Summary from '../components/shopping_cart/Summary';
 import Checkout from '../components/shopping_cart/Checkout';
@@ -32,7 +31,7 @@ const ShoppingCart = () => {
     }
 
     return (
-        <CartProvider>
+        <div style={{height: '100%', width: '100%'}}>
             {!checkout ? (
                 <div className="shopping-cart-details">
                     <ItemsCart />
@@ -46,7 +45,7 @@ const ShoppingCart = () => {
             ) : (
                 <Checkout deliveryMethod={deliveryMethod} total={total} setCheckout={setCheckout} />
             )}
-        </CartProvider>
+        </div>
     );
 };
 

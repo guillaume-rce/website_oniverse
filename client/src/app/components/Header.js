@@ -57,12 +57,12 @@ function Header(props) {
 
     return (
         <div className='header_container'>
-            {opacity !== 0 ? (
+            {opacity !== 0 || !props.hide ? (
                 <header className='header' style={(props.hide ? { opacity } : {})} >
                     <img src={logo} alt="Logo" className='header_logo' />
                     <ul className='header_nav'>
                         <li className='header_nav_item'><Link to='/'>Home</Link></li>
-                        <li className='header_nav_item'><a href='#games'>Games</a></li>
+                        <li className='header_nav_item'><a href='/games'>Games</a></li>
                         <li className='header_nav_item'><a href='#news'>News</a></li>
                         <li className='header_nav_item'><a href='#about'>About</a></li>
                     </ul>
