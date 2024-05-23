@@ -9,6 +9,7 @@ const app = express();
 const gamesRoutes = require('./routes/games');
 const imagesRoutes = require('./routes/images');
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
 const deliveryRoutes = require('./routes/delivery');
@@ -24,7 +25,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/games', gamesRoutes);
 app.use('/images', imagesRoutes);
 app.use('/auth', authRoutes);
-app.use('/user', usersRoutes);
+app.use('/user', userRoutes);
+app.use('/users', usersRoutes);
 
 app.use('/orders', ordersRoutes);
 app.use('/delivery', deliveryRoutes);

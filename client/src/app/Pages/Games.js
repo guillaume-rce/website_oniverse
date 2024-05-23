@@ -114,7 +114,7 @@ const Games = () => {
     }
 
     return (
-        <div style={{ height: '100%', width: '100%' }}>
+        <div style={{ width: '100%', minHeight: '100%' }}>
             <Header hide={false} />
             <div className='games-page'>
                 <label className='title'>Nos jeux</label>
