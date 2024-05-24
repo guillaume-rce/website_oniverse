@@ -5,11 +5,14 @@ import defaultProfileImage from '../../res/default/profile.jpg';
 import ShippingCart from './header/ShoppingCart';
 import ProfileCart from './header/ProfileCart';
 import SearchCart from './header/SearchCart';
+import { useCart } from '../CartContext';
 import './Header.css';
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 function Header(props) {
+    const { cart } = useCart();
+
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
     const [profileImage, setProfileImage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -95,11 +98,13 @@ function Header(props) {
     const toggleCart = () => {
         setCartVisible(!isCartVisible);
         setProfileVisible(false);
+        setSearchVisible(false);
     };
 
     const toggleProfile = () => {
         setProfileVisible(!isProfileVisible);
         setCartVisible(false);
+        setSearchVisible(false);
     };
 
     const handleSearch = (searchValue) => {
@@ -108,6 +113,9 @@ function Header(props) {
     
         if (searchValue.length > 0) {
             setSearchVisible(true);
+            setCartVisible(false);
+            setProfileVisible(false);
+
             const searchValueFormatted = searchValue.toLowerCase();
     
             /* Search for games */
@@ -131,7 +139,7 @@ function Header(props) {
                 const pseudoFormatted = user.pseudo.toLowerCase();
                 if (pseudoFormatted.includes(searchValueFormatted)) {
                     usersSearch.push({
-                        image: user.image,
+                        image: user.image ? user.image : defaultProfileImage,
                         title: user.pseudo,
                         url: `/user/${user.id}`
                     });
@@ -143,6 +151,14 @@ function Header(props) {
             setSearchVisible(false);
         }
     };
+
+    const getCartLength = () => {
+        let length = 0;
+        cart.forEach(game => {
+            length += game.quantity;
+        });
+        return length;
+    }
 
     return (
         <div className='header_container'>
@@ -158,15 +174,17 @@ function Header(props) {
                     <div className='header_search'>
                         <input type='text' placeholder='Search' className='header_search_input'
                             onChange={(e) => handleSearch(e.target.value)} />
-                        <button className='header_search_button'>
+                        <div className='header_search_button'>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="100%" height="100%">
                                 <path d="M0 0h24v24H0z" fill="none" />
                                 <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                             </svg>
-                        </button>
+                        </div>
                     </div>
                     <button className='header_cart' onClick={toggleCart}>
                         <img src={shoppingCart} alt="Shopping cart" className='header_cart_img' />
+                        { getCartLength() > 0 && 
+                            <div className='header_cart_number'></div>}
                     </button>
                     <div className='header_profile'>
                         <img src={profileImage || defaultProfileImage} alt="Profile" className='header_profile_img'

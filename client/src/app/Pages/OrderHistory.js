@@ -10,7 +10,7 @@ const OrderHistory = () => {
         window.location.href = '/auth';
     }
 
-    const [orders, setOrders] = useState();
+    const [orders, setOrders] = useState(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -22,9 +22,9 @@ const OrderHistory = () => {
                     setError('Failed to fetch orders');
                 }
             )
-            .then((data) => {
-                if (data.length === 0) {
-                    console.error('No orders found');
+            .then(data => {
+                if (!data || data.length === 0 || data.error) {
+                    console.log('No orders found');
                     return;
                 }
 
@@ -32,7 +32,7 @@ const OrderHistory = () => {
             });
     }, []);
 
-    if (!orders || orders.length === 0) {
+    if (!orders) {
         return <div>Loading...</div>;
     }
 
@@ -41,14 +41,22 @@ const OrderHistory = () => {
             <button className="back-button"
                 onClick={() => window.history.back()}
             >{"< BACK"}</button>
-            <div className="order-history">
-                <label className='order-history-title'>Order History</label>
-                <div className="orders-history">
-                    {orders.map((order) => (
-                        <Order key={order.id} order={order} />
-                    ))}
-                </div>
-            </div>
+            {
+                orders.length > 0 ?
+                    <div className="order-history">
+                        <label className='order-history-title'>Historique des commandes</label>
+                        <div className="orders-history">
+                            {orders.map((order) => (
+                                <Order key={order.id} order={order} />
+                            ))}
+                        </div>
+                    </div>
+                    :
+                    <div className="order-history">
+                        <label className='order-history-title'>Pas de commandes</label>
+                        <label className='order-history-subtitle'>Vous n'avez pas commandé de jeux ?! 😱</label>
+                    </div>
+            }
         </div>
     );
 }

@@ -56,39 +56,66 @@ const Order = ({ order }) => {
         const diff = new Date() - new Date(dateTime);
         const seconds = Math.floor(diff / 1000);
         const intervals = [
-            { seconds: 31536000, label: 'year' },
-            { seconds: 2592000, label: 'month' },
-            { seconds: 86400, label: 'day' },
-            { seconds: 3600, label: 'hour' },
+            { seconds: 31536000, label: 'année' },
+            { seconds: 2592000, label: 'mois' },
+            { seconds: 86400, label: 'jour' },
+            { seconds: 3600, label: 'heure' },
             { seconds: 60, label: 'minute' }
         ];
 
         for (let i = 0; i < intervals.length; i++) {
             const interval = Math.floor(seconds / intervals[i].seconds);
             if (interval >= 1) {
-                return interval + ' ' + intervals[i].label + (interval > 1 ? 's' : '') + ' ago';
+                return interval + ' ' + intervals[i].label + ((intervals[i].label != 'mois' && interval > 1) ? 's' : '') + '';
             }
         }
-        return seconds + ' seconds ago';
+        return seconds + ' secondes';
     };
+
+    const enterMitigate = () => {
+        fetch(`http://localhost:3001/orders/${order.id}/advance-state`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                state: 'MITIGE'
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Failed to advance order state:', data.error);
+                    setError('Failed to advance order state');
+                    return;
+                }
+                console.log('Order state advanced:', data);
+            })
+            .catch(error => {
+                console.error('Failed to advance order state:', error);
+                setError('Failed to advance order state');
+            });
+    };
+
 
     return (
         <div className="order-history-details">
             <div className="order-history-header">
-                <label>Order ID: #{order.id}</label>
-                <label>Total: {order.total} €</label>
+                <label>Commande: #{order.id}</label>
+                <label>Total : {order.total} €</label>
                 <div className="payment-method">
-                    <label>Payment Mode:</label>
+                    <label>Mode de payement :</label>
                     {order.paymentMode === 'CB' ?
                         <img src={CB} alt="CB" className="method-icon" /> :
                         <img src={Paypal} alt="Paypal" className="method-icon" />}
                 </div>
-                <label>Ordered {timeAgo(order.creationDateTime)}</label>
+                <label>Commandé il y a {timeAgo(order.creationDateTime)}</label>
             </div>
             <div className="order-history-delivery">
                 <label className="order-history-method">{deliveryMethod}</label>
                 <OrderTimeline order={order} />
             </div>
+            <button className="order-history-mitigate" onClick={enterMitigate}>Signaler un problème... 😢</button>
             <div className="order-history-items">
                 {items.map((item) => (
                     <Item key={item.id} item={item} />

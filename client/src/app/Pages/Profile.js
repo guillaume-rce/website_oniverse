@@ -61,7 +61,7 @@ function Profile() {
             .then(response => response.json())
             .then(data => {
                 if (!data || data.length === 0 || data.error) {
-                    console.error('Aucun jeu trouvé pour l\'utilisateur');
+                    console.log('Aucun jeu trouvé pour l\'utilisateur');
                     return;
                 }
                 setGames(data);

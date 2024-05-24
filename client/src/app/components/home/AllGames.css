@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     background-color: #f5f5f5;
-    gap: 20px;
+    padding: 20px;
 }
 
 .AllGames_title {
@@ -19,8 +19,8 @@
     align-items: center;
     margin: 0 auto;
     gap: 20px;
-    padding: 20px;
     box-sizing: border-box;
+    padding: 20px;
     width: 100%;
     height: 100%;
     overflow: hidden;

@@ -2,7 +2,7 @@ import SearchCard from "./SearchCard";
 import './SearchCart.css';
 
 const SearchCart = ({ games, users }) => {
-    if (!games || !users || games.length === 0 && users.length === 0) {
+    if (!games || !users || (games.length === 0 && users.length === 0)) {
         return (
             <div className="search-cart">
                 <label className="search-cart-category">No results</label>
@@ -22,12 +22,16 @@ const SearchCart = ({ games, users }) => {
                     </div>
                 </div>
             }
+            {
+                games.length > 0 && users.length > 0 &&
+                <div className="search-cart-separator"></div>
+            }
             {users.length > 0 &&
                 <div className="search-cart-category">
                     <label className="search-cart-category-label">Utilisateurs</label>
                     <div className="search-cart-items">
                         {users.map((user) => (
-                            <SearchCard key={user.id} image={user.image} title={user.pseudo} url={user.url} />
+                            <SearchCard key={user.id} image={user.image} title={user.title} url={user.url} />
                         ))}
                     </div>
                 </div>

@@ -113,9 +113,18 @@
 }
 
 .header_search_button {
-    height: 100%;
+    height: 85%;
     aspect-ratio: 1/1;
     background-color: transparent;
     border: none;
-    cursor: pointer;
+}
+
+.header_cart_number {
+    position: absolute;
+    top: 10px;
+    right: 78px;
+    width: 12px;
+    height: 12px;
+    background-color: #f00;
+    border-radius: 50%;
 }

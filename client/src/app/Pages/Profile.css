@@ -87,10 +87,11 @@
 
 .profile_games {
     /* this is a div with every games of the user. Make a grid with 2 columns */
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 10px;
-    justify-items: center;
 }
 
 .profile_add_game_button {

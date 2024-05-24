@@ -42,6 +42,11 @@
     margin-bottom: 30px;
 }
 
+.order-history-subtitle {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
 .orders-history {
     display: flex;
     flex-direction: column;

@@ -11,7 +11,7 @@ function ShoppingCart() {
 
     return (
         <div className="shopping-cart">
-            <h1 className="shopping-cart-title">Panier</h1>
+            <label className="shopping-cart-title">Panier</label>
             {
                 cart.length === 0 ? (
                     <p className="shopping-cart-empty">Votre panier est vide</p>

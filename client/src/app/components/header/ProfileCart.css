@@ -27,10 +27,11 @@
     padding: 10px;
     display: flex;
     align-items: center;
+    transition: all 0.3s;
 }
 
 .profile_button:hover {
-    scale: 1.02;
+    scale: 1.05;
 }
 
 .profile_button_img {

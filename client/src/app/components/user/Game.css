@@ -1,0 +1,32 @@
+.game {
+    /* this is a div with the game image in background. There is a label in it, put it in the down center */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100px;
+    width: 100px;
+    transition: all 0.3s;
+    border-radius: 5px;
+    display: flex;
+    align-items: end;
+}
+
+.game:hover {
+    transform: scale(1.1);
+}
+
+.game-title {
+    /* this is the label in the game div */
+    color: white;
+    font-size: auto;
+}
+
+.game-titlebg {
+    /* this is the background of the label in the game div */
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    width: 100%;
+    text-align: center;
+    padding: 0px 5px 5px 5px;
+}
+
