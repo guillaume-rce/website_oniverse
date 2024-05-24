@@ -8,8 +8,8 @@ const User = ({ user }) => {
             <label className="user-id">ID: #{user.id}</label>
             <img className="user-avatar" src={user.image ? user.image : defaultAvatar} alt="avatar" />
             <div className="user-info">
-                <label className="user-name">Pseudo: {user.pseudo}</label>
-                <label className="user-email">Email: {user.email}</label>
+                <label className="user-name">{user.pseudo}</label>
+                <label className="user-email">{user.email}</label>
             </div>
         </div>
     );
