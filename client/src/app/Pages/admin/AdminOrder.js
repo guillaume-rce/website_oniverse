@@ -54,8 +54,14 @@ const AdminOrder = () => {
                 }
             )
             .then((data) => {
-                if (!data) {
+                if (!data || (data.error && data.error !== 'No items found for this order.')) {
                     console.error('No items found');
+                    return;
+                }
+
+                if (data.error === 'No items found for this order.' || data.length === 0) {
+                    setItems([]);
+                    console.log('No items found');
                     return;
                 }
 
@@ -121,8 +127,7 @@ const AdminOrder = () => {
                                 data.quantity = item.quantity || 1;
                                 setDigitalItems([...digitalItems, data]);
                             }
-                        }
-                        );
+                        });
                 }
             });
         }
@@ -195,15 +200,11 @@ const AdminOrder = () => {
     ];
 
     const nextStep = () => {
-        const steps = ["CONFIRMED", "IN_PREPARATION", "SEND", "RECEIVED", "CLOSED"];
-        const nextState = steps.indexOf(order.state) === steps.length - 1 ? order.state : steps[steps.indexOf(order.state) + 1];
-        console.log(nextState)
         fetch(`http://localhost:3001/orders/${order.id}/advance-state`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nextState })
         })
             .then(
                 (response) => response.json(),
@@ -221,6 +222,18 @@ const AdminOrder = () => {
                 data.state = data.newState
                 data.lastUpdateDateTime = new Date().toISOString();
             });
+    }
+
+    const closeMitigation = () => {
+        fetch(`http://localhost:3001/orders/${order.id}/advance-state`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nextState: 'CLOSED'
+            })
+        })
     }
 
     return (
@@ -264,7 +277,10 @@ const AdminOrder = () => {
                 <div className="order-status">
                     <label className="title" style={{ fontSize: '1.5em' }}>Statut de la commande</label>
                     <OrderTimeline order={order} />
-                    <button className="btn-next-step" onClick={nextStep}>Passer à l'étape suivante</button>
+                    {order.state === 'MITIGE' ?
+                        <button className="btn-next-step" onClick={closeMitigation}>Fermer le problème</button>
+                        :
+                        <button className="btn-next-step" onClick={nextStep}>Passer à l'étape suivante</button>}
                 </div>
             </div>
             <div className="order-infos">
@@ -303,14 +319,17 @@ const AdminOrder = () => {
             <div className="order-items-list">
                 <label className="title" style={{ fontSize: '1.5em' }}>Liste des items</label>
                 <div className="items-list">
-                    {digitalItems.map((item) => (
+                    { digitalItems.length > 0 ?
+                    digitalItems.map((item) => (
                         <div className="item-card" key={item.id}>
                             <img className="item-image" src={item.image.path} alt="item" />
                             <label className="item-name">{item.name}</label>
                             <label className="item-price">{item.price}€</label>
                             <label className="item-quantity">Quantité: {item.quantity}</label>
                         </div>
-                    ))}
+                    )) :
+                    <label className="no-items">Aucun item n'a été trouvé... Cela ne devrait pas arriver !</label>
+                    }
                 </div>
             </div>
         </div>

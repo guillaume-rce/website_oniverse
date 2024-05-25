@@ -23,14 +23,26 @@ const OrderHistory = () => {
                 }
             )
             .then(data => {
-                if (!data || data.length === 0 || data.error) {
+                if (!data || (data.error && data.error !== 'No orders found for this user.')) { 
+                    console.error('Failed to fetch orders', data.error);
+                    setError('Failed to fetch orders');
+                    return;
+                }
+
+                if (data.error === 'No orders found for this user.' || data.length === 0) {
+                    setOrders([]);
                     console.log('No orders found');
                     return;
                 }
 
+
                 setOrders(data);
             });
     }, []);
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     if (!orders) {
         return <div>Loading...</div>;
@@ -42,7 +54,7 @@ const OrderHistory = () => {
                 onClick={() => window.history.back()}
             >{"< BACK"}</button>
             {
-                orders.length > 0 ?
+                orders.length > 0 && orders[0] !== 'empty' ?
                     <div className="order-history">
                         <label className='order-history-title'>Historique des commandes</label>
                         <div className="orders-history">

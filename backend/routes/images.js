@@ -19,8 +19,6 @@ const content = mysql.createConnection({
  *  description: Gestion des images 
  */
 
-
-
 /**
  * @swagger
  * /images:

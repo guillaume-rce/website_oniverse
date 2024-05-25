@@ -6,7 +6,7 @@ const OrderTimeline = ({ order }) => {
     const states = ["Confirmed", "In preparation", "Send", "Received", "Closed"]
     // Capitalize and replace underscore with space for database compatibility
     const currentState = order.state.toLowerCase().replace(/^\w/, (c) => c.toUpperCase()).replace("_", " ");
-    const stateIndex = states.indexOf(currentState);
+    const stateIndex = isMitigated ? states.indexOf("Closed") : states.indexOf(currentState);
 
     const formatDate = (dateTime) => {
         const date = new Date(dateTime);

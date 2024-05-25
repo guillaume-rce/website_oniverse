@@ -47,3 +47,30 @@
     gap: 16px;
     padding: 20px;
 }
+
+.order-history-mitigated {
+    color: #ff4d4d;
+    font-size: 1em;
+    width: 100%;
+    text-align: center;
+    text-wrap: wrap;
+}
+
+.order-history-mitigate {
+    color: #ff4d4d;
+    font-size: 1em;
+    width: 70%;
+    text-align: center;
+    margin: 0 auto;
+    background-color: #f7caca;
+    border-radius: 5px;
+    border: 1px solid #ff4d4d;
+    padding: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.order-history-mitigate:hover {
+    background-color: #ff4d4d;
+    color: #f7caca;
+}

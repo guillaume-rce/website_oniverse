@@ -8,12 +8,25 @@ import OrderTimeline from './OrderTimeline';
 const Order = ({ order }) => {
     const [items, setItems] = useState([]);
     const [deliveryMethod, setDeliveryMethod] = useState("");
+    const [orderDetails, setOrderDetails] = useState(order);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetch(`http://localhost:3001/orders/items/${order.id}`)
+        fetch(`http://localhost:3001/orders/items/${orderDetails.id}`)
             .then(response => response.json())
             .then(data => {
+                if (data.error && data.error !== 'No items found for this order.') {
+                    console.error('Failed to fetch items for order', orderDetails.id, data.error);
+                    setError('Failed to fetch items for order');
+                    setItems([]);  // Ensure items is always an array
+                    return;
+                }
+                if (data.error === 'No items found for this order.' || !data) {
+                    setItems([]);
+                    console.log('No items found for order', orderDetails.id);
+                    return;
+                }
+
                 if (Array.isArray(data)) {
                     setItems(data);
                 } else {
@@ -22,35 +35,33 @@ const Order = ({ order }) => {
                 }
             })
             .catch(error => {
-                console.error('Failed to fetch items for order', order.id, error);
+                console.error('Failed to fetch items for order', orderDetails.id, error);
                 setError('Failed to fetch items for order');
                 setItems([]);  // Ensure items is always an array
             });
-    }, [order.id]);
+    }, [orderDetails.id]);
 
     useEffect(() => {
-        fetch(`http://localhost:3001/delivery/${order.deliveryMethod}`)
+        fetch(`http://localhost:3001/delivery/${orderDetails.deliveryMethod}`)
             .then(
                 (response) => response.json(),
                 (error) => {
-                    console.error('Failed to fetch delivery method', order.deliveryMethod, error);
+                    console.error('Failed to fetch delivery method', orderDetails.deliveryMethod, error);
                     setError('Failed to fetch delivery method');
                 }
             )
             .then((data) => {
                 if (!data) {
-                    console.error('No delivery method found for order', order.deliveryMethod);
+                    console.error('No delivery method found for order', orderDetails.deliveryMethod);
                     return;
                 }
                 setDeliveryMethod(data.name);
             });
-    }, [order.deliveryMethod]);
+    }, [orderDetails.deliveryMethod]);
 
     if (!deliveryMethod || items.length === 0) {
         return;
     }
-
-    console.log(items);
 
     const timeAgo = (dateTime) => {
         const diff = new Date() - new Date(dateTime);
@@ -73,13 +84,13 @@ const Order = ({ order }) => {
     };
 
     const enterMitigate = () => {
-        fetch(`http://localhost:3001/orders/${order.id}/advance-state`, {
+        fetch(`http://localhost:3001/orders/${orderDetails.id}/advance-state`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                state: 'MITIGE'
+                nextState: 'MITIGE'
             })
         })
             .then(response => response.json())
@@ -90,6 +101,8 @@ const Order = ({ order }) => {
                     return;
                 }
                 console.log('Order state advanced:', data);
+                const newOrder = { ...orderDetails, state: 'MITIGE' };
+                setOrderDetails(newOrder);
             })
             .catch(error => {
                 console.error('Failed to advance order state:', error);
@@ -101,21 +114,24 @@ const Order = ({ order }) => {
     return (
         <div className="order-history-details">
             <div className="order-history-header">
-                <label>Commande: #{order.id}</label>
-                <label>Total : {order.total} €</label>
+                <label>Commande: #{orderDetails.id}</label>
+                <label>Total : {orderDetails.total} €</label>
                 <div className="payment-method">
                     <label>Mode de payement :</label>
-                    {order.paymentMode === 'CB' ?
+                    {orderDetails.paymentMode === 'CB' ?
                         <img src={CB} alt="CB" className="method-icon" /> :
                         <img src={Paypal} alt="Paypal" className="method-icon" />}
                 </div>
-                <label>Commandé il y a {timeAgo(order.creationDateTime)}</label>
+                <label>Commandé il y a {timeAgo(orderDetails.creationDateTime)}</label>
             </div>
             <div className="order-history-delivery">
                 <label className="order-history-method">{deliveryMethod}</label>
-                <OrderTimeline order={order} />
+                <OrderTimeline order={orderDetails} />
             </div>
-            <button className="order-history-mitigate" onClick={enterMitigate}>Signaler un problème... 😢</button>
+            {orderDetails.state === 'MITIGE' ?
+                <label className="order-history-mitigated">Vous avez signalé un problème... Args ! 😢<br/>Nous allons vous contacter par email.</label> :
+                <button className="order-history-mitigate" onClick={enterMitigate}>Signaler un problème... 😢</button>
+            }
             <div className="order-history-items">
                 {items.map((item) => (
                     <Item key={item.id} item={item} />

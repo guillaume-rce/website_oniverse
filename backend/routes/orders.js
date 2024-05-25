@@ -476,7 +476,7 @@ router.put('/:id/advance-state', (req, res) => {
         CONFIRMED: 'IN_PREPARATION',
         IN_PREPARATION: 'SEND',
         SEND: 'RECEIVED',
-        RECEIVED: 'CLOSED'
+        RECEIVED: 'CLOSED',
     };
 
     internal.query('SELECT state FROM `order` WHERE id = ?', [orderId], (error, results) => {
@@ -489,9 +489,9 @@ router.put('/:id/advance-state', (req, res) => {
         }
 
         const currentState = results[0].state;
-        const newState = nextState || stateTransition[currentState];
+        const newState = nextState ? nextState : stateTransition[currentState];
 
-        if (!newState || !validStates.includes(newState) || !stateTransition[currentState]) {
+        if (!newState || !validStates.includes(newState)) {
             return res.status(400).json({ error: 'Invalid state transition.' });
         }
 

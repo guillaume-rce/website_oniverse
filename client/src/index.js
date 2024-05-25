@@ -14,6 +14,7 @@ import AdminOrders from './app/Pages/admin/AdminOrders';
 import AdminOrder from './app/Pages/admin/AdminOrder';
 import AdminGames from './app/Pages/admin/AdminGames';
 import AdminGame from './app/Pages/admin/AdminGame';
+import AdminUser from './app/Pages/admin/AdminUser';
 import User from './app/Pages/User';
 
 import reportWebVitals from './reportWebVitals';
@@ -39,6 +40,7 @@ root.render(
           <Route exact path="/admin/orders/:id" component={AdminOrder} />
           <Route exact path="/admin/games" component={AdminGames} />
           <Route exact path="/admin/games/:id" component={AdminGame} />
+          <Route exact path="/admin/users/:id" component={AdminUser} />
           <Route exact path="/user/:userId" component={User} />
           <Route component={QuatreCentQuatre} />
         </Switch>

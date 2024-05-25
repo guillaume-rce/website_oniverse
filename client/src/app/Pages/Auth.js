@@ -115,7 +115,6 @@ function Auth() {
             </div>
             <button className="button">Login</button>
           </form>
-          <text className="login_forgot">Forgot your password?<a href="/forgot">Click here</a></text>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </div>
         }
