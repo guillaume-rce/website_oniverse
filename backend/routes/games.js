@@ -502,6 +502,74 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
 
 /**
  * @swagger
+ * /games/{id}/ordered:
+ *   get:
+ *     summary: Check if a game has been ordered and if the game exists
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the game to check
+ *     responses:
+ *       200:
+ *         description: Indicates whether the game has been ordered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 hasBeenOrdered:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id/ordered', async (req, res) => {
+    const gameId = req.params.id;
+
+    // Check if the game exists in the content database first
+    const gameExistsQuery = 'SELECT 1 FROM games WHERE id = ?';
+    try {
+        const [gameExists] = await content.promise().query(gameExistsQuery, [gameId]);
+
+        if (gameExists.length === 0) {
+            return res.status(404).json({ error: 'Game not found.' });
+        }
+
+        // If the game exists, check if it has been part of any orders
+        const internalDataConnection = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'root',
+            database: 'internal_data',
+        });
+
+        const orderCheckQuery = 'SELECT 1 FROM order_item WHERE item_id = ? LIMIT 1;';
+        const [orderExists] = await internalDataConnection.promise().query(orderCheckQuery, [gameId]);
+
+        internalDataConnection.end();
+
+        if (orderExists.length > 0) {
+            // If the game is part of an order, return true
+            res.status(200).json({ hasBeenOrdered: true, message: "This game has been ordered and cannot be deleted." });
+        } else {
+            // If the game is not part of any order, return false
+            res.status(200).json({ hasBeenOrdered: false, message: "This game has not been ordered and can be safely deleted." });
+        }
+    } catch (error) {
+        console.error('Error during the ordered check:', error);
+        res.status(500).json({ error: 'Server error checking if the game has been ordered.' });
+    }
+});
+
+/**
+ * @swagger
  * /games/{id}:
  *   get:
  *     summary: Retrieve a single game by ID including stock information

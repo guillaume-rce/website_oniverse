@@ -303,6 +303,61 @@ router.get('/items', (req, res) => {
 
 /**
  * @swagger
+ * /orders/items/user/{userId}:
+ *   get:
+ *     summary: Retrieve all items ordered by a specific user
+ *     tags: [Orders, Items]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           description: The user ID to retrieve ordered items for.
+ *     responses:
+ *       200:
+ *         description: A list of all items ordered by the specified user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       404:
+ *         description: No items found for this user
+ *       500:
+ *         description: Server error
+ */
+router.get('/items/user/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // First, fetch all orders by the user
+        const [orders] = await internal.promise().query('SELECT id FROM `order` WHERE user = ?', [userId]);
+
+        if (orders.length === 0) {
+            return res.status(404).json({ error: 'No orders found for this user.' });
+        }
+
+        // Extract order IDs
+        const orderIds = orders.map(order => order.id);
+
+        // Now, fetch all items from these orders
+        const [items] = await internal.promise().query('SELECT * FROM order_item WHERE order_id IN (?)', [orderIds]);
+
+        if (items.length === 0) {
+            return res.status(404).json({ error: 'No items found for the orders of this user.' });
+        }
+
+        res.status(200).json(items);
+    } catch (error) {
+        console.error('Error during the query:', error);
+        res.status(500).json({ error: 'Server error during the SELECT query.' });
+    }
+});
+
+/**
+ * @swagger
  * /orders/items/{id}:
  *   get:
  *     summary: Retrieve all items associated with a specific order ID

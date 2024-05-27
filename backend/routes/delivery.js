@@ -185,7 +185,7 @@ router.get('/:id', (req, res) => {
  * @swagger
  * /delivery/{id}:
  *   delete:
- *     summary: Delete a delivery method by ID
+ *     summary: Delete a delivery method by ID, ensuring it has not been used in any orders
  *     tags: [Delivery]
  *     parameters:
  *       - in: path
@@ -193,26 +193,37 @@ router.get('/:id', (req, res) => {
  *         schema:
  *           type: integer
  *         required: true
- *         description: The ID of the delivery method
+ *         description: The ID of the delivery method to delete
  *     responses:
  *       200:
  *         description: Delivery method deleted successfully
+ *       400:
+ *         description: Delivery method cannot be deleted because it has been used in orders
  *       404:
  *         description: Delivery method not found
  *       500:
- *         description: Server error during delivery method deletion
+ *         description: Server error during the deletion process
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const deliveryId = req.params.id;
 
-    internal.query('DELETE FROM delivery_method WHERE id = ?', [deliveryId], (error) => {
-        if (error) {
-            console.error('Erreur lors de la requête DELETE :', error);
-            res.status(500).json({ error: 'Erreur serveur lors de la requête DELETE.' });
-        } else {
-            res.status(200).json({ message: 'Méthode de livraison supprimée avec succès.' });
+    try {
+        const [methodExists] = await internal.promise().query('SELECT 1 FROM delivery_method WHERE id = ?', [deliveryId]);
+        if (methodExists.length === 0) {
+            return res.status(404).json({ error: 'Delivery method not found.' });
         }
-    });
+
+        const [used] = await internal.promise().query('SELECT 1 FROM `order` WHERE deliveryMethod = ? LIMIT 1', [deliveryId]);
+        if (used.length > 0) {
+            return res.status(400).json({ error: 'Delivery method cannot be deleted because it has been used in orders.' });
+        }
+
+        await internal.promise().query('DELETE FROM delivery_method WHERE id = ?', [deliveryId]);
+        res.status(200).json({ message: 'Delivery method deleted successfully.' });
+    } catch (error) {
+        console.error('Error during the deletion process:', error);
+        res.status(500).json({ error: 'Server error during the deletion process.' });
+    }
 });
 
 /**
@@ -276,6 +287,57 @@ router.put('/:id/available', (req, res) => {
             res.status(200).json({ message: 'Delivery method availability updated successfully.' });
         }
     });
+});
+
+/**
+ * @swagger
+ * /delivery/{id}/used:
+ *   get:
+ *     summary: Check if a delivery method has been used in any orders
+ *     tags: [Delivery]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the delivery method to check
+ *     responses:
+ *       200:
+ *         description: Indicates whether the delivery method has been used
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 used:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Delivery method not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id/used', async (req, res) => {
+    const deliveryId = req.params.id;
+
+    try {
+        const [methodExists] = await internal.promise().query('SELECT 1 FROM delivery_method WHERE id = ?', [deliveryId]);
+        if (methodExists.length === 0) {
+            return res.status(404).json({ error: 'Delivery method not found.' });
+        }
+
+        const [used] = await internal.promise().query('SELECT 1 FROM `order` WHERE deliveryMethod = ? LIMIT 1', [deliveryId]);
+        if (used.length > 0) {
+            res.status(200).json({ used: true, message: "This delivery method has been used in orders." });
+        } else {
+            res.status(200).json({ used: false, message: "This delivery method has not been used in any orders." });
+        }
+    } catch (error) {
+        console.error('Error during the check:', error);
+        res.status(500).json({ error: 'Server error checking if the delivery method has been used.' });
+    }
 });
 
 module.exports = router;

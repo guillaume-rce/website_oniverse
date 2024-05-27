@@ -63,6 +63,31 @@ const AdminUser = () => {
                 setOrders(data);
             });
 
+        fetch(`http://localhost:3001/orders/items/user/${id}`)
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch items', error);
+                    setError('Failed to fetch items');
+                }
+            )
+            .then((data) => {
+                if (!data || (data.error && data.error !== 'No items found for this user.' &&
+                    data.error !== 'No orders found for this user.')) {
+                    console.error('No items found');
+                    return;
+                }
+
+                if (data.error === 'No items found for this user.' || data.error === 'No orders found for this user.' ||
+                    data.length === 0) {
+                    setItems([]);
+                    console.log('No items found');
+                    return;
+                }
+
+                setItems(data);
+            });
+
         fetch(`http://localhost:3001/user/${id}/games`)
             .then(
                 (response) => response.json(),
@@ -86,34 +111,6 @@ const AdminUser = () => {
                 setGames(data);
             });
     }, [id]);
-
-    if (orders && orders.length > 0) {
-        orders.forEach((order) => {
-            fetch(`http://localhost:3001/orders/items/${order.id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error && data.error !== 'No items found for this order.') {
-                        console.error('Failed to fetch items for order', order.id, data.error);
-                        setError('Failed to fetch items for order');
-                        return;
-                    }
-                    if (data.error === 'No items found for this order.' || !data) {
-                        console.log('No items found for order', order.id);
-                        return;
-                    }
-
-                    if (Array.isArray(data) && data.length > 0) {
-                        setItems(items.concat(data));
-                    } else {
-                        console.error('Expected an array, but received:', data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to fetch items for order', order.id, error);
-                    setError('Failed to fetch items for order');
-                });
-        });
-    }
 
     const animateValue = (start, end, duration, setter) => {
         let startTimestamp = null;
@@ -152,7 +149,7 @@ const AdminUser = () => {
                     animateValue(0, total, 2000, setTotal);
                     animateValue(0, totalOrders, 2000, setTotalOrders);
                     animateValue(0, totalItems, 2000, setTotalItems);
-                    
+
                     setIsAnimated(true);
                 }
             },
@@ -221,26 +218,30 @@ const AdminUser = () => {
             <div className="admin-user-orders">
                 <label className="title">Commandes</label>
                 <div className="admin-user-orders-content">
-                    {orders.map((order) => (
+                    { orders.length === 0 ? <label>Aucune commande trouvée</label> :
+                    orders.map((order) => (
                         <div key={order.id} className="admin-user-order">
                             <label className="admin-user-order-id">ID: #{order.id}</label>
                             <label className="admin-user-order-date">Date: {formatDate(order.creationDateTime)}</label>
                             <label className="admin-user-order-total">Total: {order.total}€</label>
                         </div>
-                    ))}
+                    ))
+                    }
                 </div>
             </div>
             <div className="admin-user-games">
-                <label className="admin-user-games-label">Jeux</label>
+                <label className="title">Jeux</label>
                 <div className="admin-user-games-content">
-                    {games.map((game) => (
+                    { games.length === 0 ? <label className="admin-user-no-games">Aucun jeu trouvé</label> :
+                    games.map((game) => (
                         <div key={game.id} className="admin-user-game">
+                            <label className="admin-user-game-id">#{game.id}</label>
                             <img src={game.logo ? game.logo.path : game.image.path} alt="game" className="admin-user-game-image" />
-                            <label className="admin-user-game-id">ID: #{game.id}</label>
                             <label className="admin-user-game-name">{game.name}</label>
                             <label className="admin-user-game-price">{game.price}€</label>
                         </div>
-                    ))}
+                    ))
+                    }
                 </div>
             </div>
         </div>
