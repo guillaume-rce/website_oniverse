@@ -220,7 +220,7 @@ const AdminUser = () => {
                 <div className="admin-user-orders-content">
                     { orders.length === 0 ? <label>Aucune commande trouvée</label> :
                     orders.map((order) => (
-                        <div key={order.id} className="admin-user-order">
+                        <div key={order.id} className="admin-user-order" onClick={() => window.location.href = `/admin/orders/${order.id}`}>
                             <label className="admin-user-order-id">ID: #{order.id}</label>
                             <label className="admin-user-order-date">Date: {formatDate(order.creationDateTime)}</label>
                             <label className="admin-user-order-total">Total: {order.total}€</label>
@@ -234,7 +234,7 @@ const AdminUser = () => {
                 <div className="admin-user-games-content">
                     { games.length === 0 ? <label className="admin-user-no-games">Aucun jeu trouvé</label> :
                     games.map((game) => (
-                        <div key={game.id} className="admin-user-game">
+                        <div key={game.id} className="admin-user-game" onClick={() => window.location.href = `/admin/games/${game.id}`}>
                             <label className="admin-user-game-id">#{game.id}</label>
                             <img src={game.logo ? game.logo.path : game.image.path} alt="game" className="admin-user-game-image" />
                             <label className="admin-user-game-name">{game.name}</label>

@@ -10,11 +10,6 @@
     background-color: #f5f5f5;
     box-sizing: border-box;
     transition: all 0.3s;
-    cursor: pointer;
-}
-
-.game-card-component * {
-    cursor: pointer;
 }
 
 .game-card-component:hover {

@@ -8,6 +8,7 @@ const DeliveryMethods = ({ deliveryMethods }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [deliveryMethodsVar, setDeliveryMethods] = useState(deliveryMethods);
     const [error, setError] = useState('');
 
     const handleClick = (event) => {
@@ -49,10 +50,29 @@ const DeliveryMethods = ({ deliveryMethods }) => {
                     return;
                 }
 
-                deliveryMethods.push(data);
+                setDeliveryMethods([...deliveryMethodsVar, data.deliveryMethod]);
                 setName('');
                 setPrice('');
                 setAdding(false);
+            });
+    };
+
+    const deleteDeliveryMethod = (deliveryMethod, event) => {
+        event.stopPropagation();
+        fetch(`http://localhost:3001/delivery/${deliveryMethod.id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to delete delivery method', error);
+                }
+            )
+            .then((data) => {
+                if (data) {
+                    setDeliveryMethods(deliveryMethodsVar.filter((dm) => dm.id !== deliveryMethod.id));
+                }
             });
     };
 
@@ -61,8 +81,8 @@ const DeliveryMethods = ({ deliveryMethods }) => {
             <label className="title">Méthodes de livraison</label>
             <div className="delivery-methods-body">
                 <div className="delivery-methods-container">
-                    {deliveryMethods.map((deliveryMethod) => (
-                        <DeliveryMethod key={deliveryMethod.id} deliveryMethod={deliveryMethod} />
+                    {deliveryMethodsVar.map((deliveryMethod) => (
+                        <DeliveryMethod key={deliveryMethod.id} deliveryMethod={deliveryMethod} deleteDeliveryMethod={deleteDeliveryMethod} />
                     ))}
                 </div>
                 <button className="add-delivery-method" onClick={handleClick}>

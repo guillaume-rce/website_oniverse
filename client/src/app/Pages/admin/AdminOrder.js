@@ -321,8 +321,8 @@ const AdminOrder = () => {
                 <div className="items-list">
                     { digitalItems.length > 0 ?
                     digitalItems.map((item) => (
-                        <div className="item-card" key={item.id}>
-                            <img className="item-image" src={item.image.path} alt="item" />
+                        <div className="item-card" key={item.id} onClick={() => window.location.href = `/admin/games/${item.id}`}>
+                            <img className="item-image" src={item.logo ? item.logo.path : item.image.path} alt="item" />
                             <label className="item-name">{item.name}</label>
                             <label className="item-price">{item.price}€</label>
                             <label className="item-quantity">Quantité: {item.quantity}</label>

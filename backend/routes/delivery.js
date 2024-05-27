@@ -81,7 +81,7 @@ router.get('/', (req, res) => {
  * @swagger
  * /delivery:
  *   post:
- *     summary: Create a new delivery method
+ *     summary: Create a new delivery method and return the created entry
  *     tags: [Delivery]
  *     requestBody:
  *       required: true
@@ -105,7 +105,7 @@ router.get('/', (req, res) => {
  *               available:
  *                 type: boolean
  *                 description: Indicates whether the delivery method is available.
- *                 example: false
+ *                 example: true
  *     responses:
  *       201:
  *         description: Delivery method created successfully
@@ -116,28 +116,41 @@ router.get('/', (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Delivery method created successfully.
+ *                   example: "Delivery method created successfully."
+ *                 deliveryMethod:
+ *                   $ref: '#/components/schemas/Delivery'
  *       400:
  *         description: Bad request, possibly due to missing required fields or invalid data format.
  *       500:
  *         description: Server error during the creation process
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const { name, cost, available = false } = req.body;
 
     if (!name || cost === undefined) {
         return res.status(400).json({ error: 'Name and cost are required. Cost must be a number.' });
     }
 
-    const query = 'INSERT INTO delivery_method (name, cost, available) VALUES (?, ?, ?)';
-    internal.query(query, [name, parseFloat(cost), available], (error, results) => {
-        if (error) {
-            console.error('Error during INSERT query:', error);
-            res.status(500).json({ error: 'Server error during the INSERT query.' });
+    try {
+        const insertQuery = 'INSERT INTO delivery_method (name, cost, available) VALUES (?, ?, ?)';
+        const [insertResult] = await internal.promise().query(insertQuery, [name, parseFloat(cost), available]);
+
+        // Retrieve the newly created delivery method
+        const selectQuery = 'SELECT * FROM delivery_method WHERE id = ?';
+        const [newDeliveryMethod] = await internal.promise().query(selectQuery, [insertResult.insertId]);
+
+        if (newDeliveryMethod.length > 0) {
+            res.status(201).json({
+                message: 'Delivery method created successfully.',
+                deliveryMethod: newDeliveryMethod[0]
+            });
         } else {
-            res.status(201).json({ message: 'Delivery method created successfully.', methodId: results.insertId });
+            res.status(500).json({ message: 'Failed to retrieve the newly created delivery method.' });
         }
-    });
+    } catch (error) {
+        console.error('Error during the creation process:', error);
+        res.status(500).json({ error: 'Server error during the creation process.' });
+    }
 });
 
 /**

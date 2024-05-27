@@ -172,7 +172,7 @@ function Header(props) {
                         <li className='header_nav_item'><a href='#about'>About</a></li>
                     </ul>
                     <div className='header_search'>
-                        <input type='text' placeholder='Search' className='header_search_input'
+                        <input type='text' placeholder='Rechercher' className='header_search_input'
                             onChange={(e) => handleSearch(e.target.value)} />
                         <div className='header_search_button'>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="100%" height="100%">

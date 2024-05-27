@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import './Item.css';
+import { useCart } from '../../CartContext';
 
 const Item = ({ key, item }) => {
     const { item_id, quantity, isDigital } = item;
     const [ product, setProduct ] = useState({});
     const [ error, setError ] = useState('');
+
+    const { addToCart } = useCart();
 
     useEffect(() => {
         if (isDigital) {
@@ -39,7 +42,7 @@ const Item = ({ key, item }) => {
                 <label className="order-item-name">{product.name}</label>
                 <label className="order-item-quantity">Quantity: {quantity}</label>
             </div>
-            <button className="order-item-reorder">Order Again</button>
+            <button className="order-item-reorder" onClick={() => addToCart(product)}>Reorder</button>
         </div>
     );
 };
