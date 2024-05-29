@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
 import GamePres from '../components/detail/GamePres';
+import { Helmet } from 'react-helmet';
 
 function Detail() {
     var { idGame } = useParams();
@@ -23,6 +24,9 @@ function Detail() {
 
     return (
         <div className="Detail">
+            <Helmet>
+                <title>Oniverse - {c_game.name}</title>
+            </Helmet>
             <Header hide={false} />
             { c_game ? <GamePres game={c_game} /> : <p>Le jeu numéro {idGame} n'existe pas</p> }
         </div>

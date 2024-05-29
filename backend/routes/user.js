@@ -17,7 +17,7 @@ const internal = mysql.createConnection({
 // Set up file storage
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        const uploadDir = './img';
+        const uploadDir = './public/img';
         callback(null, uploadDir);
     },
     filename: (req, file, callback) => {
@@ -326,7 +326,7 @@ router.post('/bio', (req, res, next) => {
  *               properties:
  *                 profileImage:
  *                   type: string
- *                   example: "http://localhost:3001/img/1622483492-profile.jpg"
+ *                   example: "http://localhost:3001/public/img/1622483492-profile.jpg"
  *       400:
  *         description: No file uploaded
  *       401:
@@ -343,7 +343,7 @@ router.post('/image/:type', upload.single('image'), async (req, res) => {
     if (type !== 'profile' && type !== 'banner') {
         return res.status(400).json({ error: 'Type de fichier non pris en charge.' });
     }
-    const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const imageUrl = `http://localhost:3001/public/img/${req.file.filename}`;
     const userId = req.headers.userid;
     const token = req.headers.token;
 
@@ -474,6 +474,68 @@ router.get('/:id/games', (req, res) => {
                 url: game.url
             }));
             res.status(200).json(formattedResults);
+        }
+    });
+});
+
+/**
+ * @swagger
+ * /user/{id}/role:
+ *   put:
+ *     summary: Update the role of a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the user whose role is to be updated
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: integer
+ *                 description: The new role ID to assign to the user
+ *     responses:
+ *       200:
+ *         description: Role updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User role updated successfully."
+ *       400:
+ *         description: Invalid role provided
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error during role update
+ */
+router.put('/:id/role', (req, res) => {
+    const userId = req.params.id;
+    const { role } = req.body;
+
+    if (typeof role !== 'number') {
+        return res.status(400).json({ error: 'Invalid role provided.' });
+    }
+
+    const query = 'UPDATE users SET role = ? WHERE id = ?';
+    internal.query(query, [role, userId], (error, result) => {
+        if (error) {
+            console.error('Error during the UPDATE query:', error);
+            res.status(500).json({ error: 'Server error during the UPDATE query.' });
+        } else if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'User not found.' });
+        } else {
+            res.status(200).json({ message: 'User role updated successfully.' });
         }
     });
 });

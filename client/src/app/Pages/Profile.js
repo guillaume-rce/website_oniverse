@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {Helmet} from "react-helmet";
 import back from '../../res/icon/left-arrow.png';
 import shopping from '../../res/icon/shopping-cart.png';
 
@@ -20,11 +21,10 @@ function Profile() {
     const [role, setRole] = useState(0); // 0: utilisateur, 1: administrateur
     const [games, setGames] = useState([]);
     const [achievements, setAchievements] = useState([]);
+    
+    const [editBio, setEditBio] = useState(false);
 
     const [errorMessage, setErrorMessage] = useState('');
-
-    const [overBanner, setOverBanner] = useState(false);
-    const [overProfile, setOverProfile] = useState(false);
 
 
     // Récupérer les informations de l'utilisateur
@@ -107,10 +107,36 @@ function Profile() {
         return <div>Chargement...</div>;
     }
 
-    console.log('games', games);
+    const handleEditBio = () => {
+        if (editBio) {
+            fetch(`http://localhost:3001/user/bio`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    userId,
+                    token: localStorage.getItem('token') || sessionStorage.getItem('token')
+                },
+                body: JSON.stringify({ bio })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    setEditBio(false);
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la mise à jour de la bio :', error);
+                    setErrorMessage('Erreur lors de la mise à jour de la bio');
+                });
+        } else {
+            setEditBio(true);
+        }
+    }
 
     return (
         <div className="profile_container">
+            <Helmet>
+                <title>Oniverse - Your profile</title>
+            </Helmet>
             <div className="profile_back_home_button" onClick={() => window.location.href = '/'}>
                 <img src={back} alt="Back" className="profile_back_home_button_img" />
                 <text className="profile_back_home_button_text">Retour à l'accueil</text>
@@ -125,7 +151,15 @@ function Profile() {
             <div className="profile_info_main_container">
                 <div className="profile_info_container">
                     <div className="profile_info_title">Bio</div>
-                    <text className="profile_info_content_text" style={{ whiteSpace: 'pre-line' }}>{bio}</text>
+                    {
+                        editBio ?
+                            <textarea className="profile_bio_edit" value={bio} onChange={e => setBio(e.target.value)} />
+                            :
+                            <text className="profile_bio">{bio}</text>
+                    }
+                    <button className="profile_edit_bio_button" onClick={handleEditBio}>
+                        {editBio ? 'Enregistrer' : 'Modifier'}
+                    </button>
                 </div>
             </div>
 

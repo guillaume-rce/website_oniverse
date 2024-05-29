@@ -3,7 +3,8 @@ import { useCart } from '../../CartContext';
 import { useEffect, useRef } from 'react';
 
 function GamePres({ game }) {
-    const { name, description, image } = game;
+    const { name, description, image, video } = game;
+    const videoPath = video;
     const { addToCart } = useCart();
 
     const buttonRef = useRef(null);
@@ -14,9 +15,9 @@ function GamePres({ game }) {
                 createSparkle(buttonRef.current);
             }
         }, 1000);
-    
+
         return () => clearInterval(intervalId);
-    }, []);    
+    }, []);
 
     const createSparkle = (button) => {
         const numberOfSparkles = 5;
@@ -30,21 +31,21 @@ function GamePres({ game }) {
             sparkle.style.top = `${Math.random() * (button.clientHeight - size)}px`;
             sparkle.className = 'sparkle';
             button.appendChild(sparkle);
-    
+
             setTimeout(() => sparkle.remove(), 1500);
         }
-    };    
+    };
 
     const handleRippleEffect = (e) => {
         const button = e.currentTarget;
         const circle = document.createElement("span");
         const diameter = Math.max(button.clientWidth, button.clientHeight);
         const radius = diameter / 2;
-    
+
         const rect = button.getBoundingClientRect();
         const x = e.clientX - rect.left - radius;
         const y = e.clientY - rect.top - radius;
-    
+
         circle.style.width = circle.style.height = `${diameter}px`;
         circle.style.left = `${x}px`;
         circle.style.top = `${y}px`;
@@ -54,18 +55,36 @@ function GamePres({ game }) {
         circle.style.transform = 'scale(0)';
         circle.style.animation = 'ripple 0.6s linear';
         button.appendChild(circle);
-    
+
         setTimeout(() => circle.remove(), 600);
-    }    
+    }
 
     return (
-        <div className="GamePres" style={{ backgroundImage: `url(${image["path"]})` }}>
-            <div className="GamePres_overlay">
-                <p className="GamePres_title">{name}</p>
-                <p className="GamePres_desc">{description}</p>
-                <button className="GamePres_add" ref={buttonRef} onClick={(e) => {addToCart(game); handleRippleEffect(e);}}>Ajouter au panier</button>
-            </div>
+        <div style={{ height: '100vh', width: '100vw' }}>
+            {
+                !videoPath ? (
+                    <div className="GamePres" style={{ backgroundImage: `url(${image["path"]})` }}>
+                        <div className="GamePres_overlay">
+                            <p className="GamePres_title">{name}</p>
+                            <p className="GamePres_desc">{description}</p>
+                            <button className="GamePres_add" ref={buttonRef} onClick={(e) => { addToCart(game); handleRippleEffect(e); }}>Ajouter au panier</button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="GamePres">
+                        <video className="GamePres" autoPlay loop muted>
+                            <source src={videoPath} type="video/mp4" />
+                        </video>
+                        <div className="GamePres_overlay">
+                            <p className="GamePres_title">{name}</p>
+                            <p className="GamePres_desc">{description}</p>
+                            <button className="GamePres_add" ref={buttonRef} onClick={(e) => { addToCart(game); handleRippleEffect(e); }}>Ajouter au panier</button>
+                        </div>
+                    </div>
+                )
+            }
         </div>
+
     );
 }
 

@@ -6,7 +6,7 @@ import ProfileInfo from "../components/user/ProfileInfo";
 import Game from "../components/user/Game";
 
 import back from '../../res/icon/left-arrow.png';
-import shopping from '../../res/icon/shopping-cart.png';
+import { Helmet } from "react-helmet";
 
 const User = () => {
     const { userId } = useParams();

@@ -187,6 +187,32 @@
     background-color: #f5f5f5;
 }
 
+.admin-user-role-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.admin-user-role-button {
+    /* Make the button fancy */
+    border: 1px solid #e69005;
+    color: #e69005;
+    background-color: #0000;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.admin-user-role-button:hover {
+    background-color: #e69005;
+    color: #f5f5f5;
+}
+
 .admin-user-games-content {
     display: flex;
     flex-direction: row;

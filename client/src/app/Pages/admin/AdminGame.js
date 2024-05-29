@@ -24,7 +24,6 @@ const AdminGame = () => {
     const [addingTags, setAddingTags] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [inputValue, setInputValue] = useState('');
 
     const [allTags, setAllTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
@@ -368,6 +367,31 @@ const AdminGame = () => {
 
                 setEditing(false);
             });
+        
+        const video = document.getElementById("video").files[0];
+        if (video) {
+            // Send video in a form data
+            const formData = new FormData();
+            formData.append("video", video);
+
+            fetch(`http://localhost:3001/games/${game.id}/video`, {
+                method: "POST",
+                body: formData,
+            })
+                .then(
+                    (response) => response.json(),
+                    (error) => {
+                        console.error("Failed to update video", error);
+                        setError("Failed to update video");
+                    }
+                )
+                .then((data) => {
+                    if (!data) {
+                        console.error("No video updated");
+                        return;
+                    }                    
+                });
+        }
     }
 
     const updateImage = (image) => {
@@ -444,8 +468,6 @@ const AdminGame = () => {
                 window.location.href = "/admin/games";
             });
     }
-
-    console.log(isOrdered);
 
     return (
         <div className="admin-game" ref={ref}>
@@ -601,6 +623,11 @@ const AdminGame = () => {
                                     <div className="admin-game-edit-input-separator"></div>
                                     <input type="text" className="admin-game-edit-input" value={url}
                                         onChange={(event) => setUrl(event.target.value)} />
+                                </div>
+                                <div className="admin-game-edit-input-container">
+                                    <label className="admin-game-edit-label">Vidéo</label>
+                                    <div className="admin-game-edit-input-separator"></div>
+                                    <input type="file" className="admin-game-edit-input" id="video" name="video" />
                                 </div>
                                 <div className="admin-game-edit-save-container">
                                     <button className="admin-game-edit-save" onClick={handleSaveClick}>Enregistrer</button>

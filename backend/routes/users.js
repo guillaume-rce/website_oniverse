@@ -14,19 +14,6 @@ const internal = mysql.createConnection({
     database: 'internal_data',
 });
 
-// Set up file storage
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        const uploadDir = './img';
-        callback(null, uploadDir);
-    },
-    filename: (req, file, callback) => {
-        const fileName = `${Date.now()}-${file.originalname}`;
-        callback(null, fileName);
-    }
-});
-const upload = multer({ storage: storage });
-
 /**
  * @swagger
  *  tags:

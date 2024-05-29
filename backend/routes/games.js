@@ -14,7 +14,7 @@ const content = mysql.createConnection({
 // File storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        const uploadDir = './img';
+        const uploadDir = './public/img';
         callback(null, uploadDir);
     },
     filename: (req, file, callback) => {
@@ -23,6 +23,30 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
+
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const videoDir = './public/videos';
+        cb(null, videoDir);
+    },
+    filename: (req, file, cb) => {
+        const fileExt = file.mimetype.split('/')[1];
+        const fileName = `${Date.now()}-${req.params.id}.${fileExt}`; // Nom du fichier basé sur l'ID du jeu et le timestamp
+        cb(null, fileName);
+    }
+});
+
+const videoUpload = multer({ 
+    storage: videoStorage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('video')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not a video file!'), false);
+        }
+    },
+    limits: { fileSize: 1024 * 1024 * 50 } // Limite de taille du fichier de 50MB
+});
 
 /**
  * @swagger
@@ -54,6 +78,9 @@ const upload = multer({ storage: storage });
  *         description:
  *           type: string
  *           description: Detailed description of the game
+ *         video:
+ *           type: string
+ *           description: URL path to the game's promotional video
  *         image:
  *           type: object
  *           properties:
@@ -124,7 +151,7 @@ const upload = multer({ storage: storage });
 router.get('/', (req, res) => {
     const query = `
         SELECT 
-            games.id, games.name, games.description, games.price, games.stock, games.url,
+            games.id, games.name, games.description, games.price, games.stock, games.url, games.video,
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
@@ -148,6 +175,7 @@ router.get('/', (req, res) => {
                         id: row.id,
                         name: row.name,
                         description: row.description,
+                        video: row.video,
                         image: {
                             id: row.image_id,
                             path: row.image_path,
@@ -241,8 +269,8 @@ router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'logo', 
     }
 
     const { name, description, price, imageIsLight, logoIsLight } = req.body;
-    const imageUrl = `http://localhost:3001/img/${req.files.image[0].filename}`;
-    const logoUrl = `http://localhost:3001/img/${req.files.logo[0].filename}`;
+    const imageUrl = `http://localhost:3001/public/img/${req.files.image[0].filename}`;
+    const logoUrl = `http://localhost:3001/public/img/${req.files.logo[0].filename}`;
 
     content.beginTransaction(async (err) => {
         if (err) {
@@ -373,7 +401,7 @@ router.put('/update-image/:id', upload.single('image'), async (req, res) => {
     }
 
     const gameId = req.params.id;
-    const imageUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const imageUrl = `http://localhost:3001/public/img/${req.file.filename}`;
     const isLight = req.body.isLight === 'true';
 
     content.beginTransaction(async (err) => {
@@ -464,7 +492,7 @@ router.put('/update-logo/:id', upload.single('logo'), async (req, res) => {
     }
 
     const gameId = req.params.id;
-    const logoUrl = `http://localhost:3001/img/${req.file.filename}`;
+    const logoUrl = `http://localhost:3001/public/img/${req.file.filename}`;
     const isLight = req.body.isLight === 'true';
 
     content.beginTransaction(async (err) => {
@@ -597,7 +625,7 @@ router.get('/:id', (req, res) => {
     const gameId = req.params.id;
     const query = `
         SELECT 
-            games.id, games.name, games.description, games.price, games.url, games.stock,
+            games.id, games.name, games.description, games.price, games.url, games.stock, games.video,
             mainImages.id AS image_id, mainImages.path AS image_path,
             mainImages.isLight AS image_isLight, mainImages.uploadDateTime AS image_uploadDateTime,
             logoImages.id AS logo_id, logoImages.path AS logo_path,
@@ -617,35 +645,31 @@ router.get('/:id', (req, res) => {
         } else if (results.length === 0) {
             res.status(404).json({ error: 'Game not found.' });
         } else {
-            const game = {
-                id: results[0].id,
-                name: results[0].name,
-                description: results[0].description,
+            const game = results.map(row => ({
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                video: row.video,
                 image: {
-                    id: results[0].image_id,
-                    path: results[0].image_path,
-                    isLight: results[0].image_isLight,
-                    uploadDateTime: results[0].image_uploadDateTime
+                    id: row.image_id,
+                    path: row.image_path,
+                    isLight: row.image_isLight,
+                    uploadDateTime: row.image_uploadDateTime
                 },
-                logo: results[0].logo_id ? {
-                    id: results[0].logo_id,
-                    path: results[0].logo_path,
-                    isLight: results[0].logo_isLight,
-                    uploadDateTime: results[0].logo_uploadDateTime
-                } : null,
-                price: results[0].price,
-                url: results[0].url,
-                stock: results[0].stock,
-                tags: []
-            };
-            results.forEach(row => {
-                if (row.tag_id) {
-                    game.tags.push({
-                        id: row.tag_id,
-                        name: row.tag_name
-                    });
-                }
-            });
+                logo: {
+                    id: row.logo_id,
+                    path: row.logo_path,
+                    isLight: row.logo_isLight,
+                    uploadDateTime: row.logo_uploadDateTime
+                },
+                price: row.price,
+                url: row.url,
+                stock: row.stock,
+                tags: row.tag_id ? [{
+                    id: row.tag_id,
+                    name: row.tag_name
+                }] : []
+            }))[0]; // Since ID is unique, the first result is the game we want.
             res.status(200).json(game);
         }
     });
@@ -1072,6 +1096,72 @@ router.post('/:id/tags', async (req, res) => {
             });
         }
     });
+});
+
+/**
+ * @swagger
+ * /games/{id}/video:
+ *   post:
+ *     summary: Upload a video for a specific game
+ *     tags: [Games]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the game
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               video:
+ *                 type: string
+ *                 format: binary
+ *                 description: Video file to upload
+ *     responses:
+ *       200:
+ *         description: Video uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Video uploaded successfully.
+ *                 videoPath:
+ *                   type: string
+ *                   example: "http://localhost:3001/public/videos/1622483492-1.mp4"
+ *       400:
+ *         description: No video uploaded or wrong file type
+ *       500:
+ *         description: Server error
+ */
+router.post('/:id/video', videoUpload.single('video'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No video uploaded.' });
+    }
+
+    const gameId = req.params.id;
+    const videoUrl = `http://localhost:3001/public/videos/${req.file.filename}`;
+
+    // Mettre à jour l'entrée de la base de données pour ajouter l'URL de la vidéo
+    try {
+        const updateGameQuery = 'UPDATE games SET video = ? WHERE id = ?';
+        await content.promise().query(updateGameQuery, [videoUrl, gameId]);
+
+        res.status(200).json({
+            message: 'Video uploaded successfully.',
+            videoPath: videoUrl
+        });
+    } catch (error) {
+        console.error('Error updating the game with video:', error);
+        res.status(500).json({ error: 'Server error during the video upload process.' });
+    }
 });
 
 module.exports = router;

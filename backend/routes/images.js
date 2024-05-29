@@ -42,7 +42,7 @@ const content = mysql.createConnection({
  *                   path:
  *                     type: string
  *                     description: The path to the image
- *                     example: /img/1622483492-chess.jpg
+ *                     example: public/img/1622483492-chess.jpg
  *                   isLight:
  *                     type: boolean
  *                     description: Indicates if the image is a light version
@@ -92,7 +92,7 @@ router.get('/', (req, res, next) => {
  *                 path:
  *                   type: string
  *                   description: The path to the image
- *                   example: /img/1622483492-chess.jpg
+ *                   example: public/img/1622483492-chess.jpg
  *                 isLight:
  *                   type: boolean
  *                   description: Indicates if the image is a light version

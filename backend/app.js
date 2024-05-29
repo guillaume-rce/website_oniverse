@@ -16,7 +16,7 @@ const deliveryRoutes = require('./routes/delivery');
 const tagsRoutes = require('./routes/tags');
 
 app.use(cors());
-app.use('/img', express.static('img'));
+app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));

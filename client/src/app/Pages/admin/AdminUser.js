@@ -184,6 +184,36 @@ const AdminUser = () => {
         return new Date(date).toLocaleDateString('fr-FR', options);
     }
 
+    const changeRole = () => {
+        fetch(`http://localhost:3001/user/${id}/role`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                role: user.role === 0 ? 1 : 0
+            })
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to change role', error);
+                    setError('Failed to change role');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No data found');
+                    return;
+                }
+
+                let newUser = user;
+                newUser.role = user.role === 0 ? 1 : 0;
+                setUser(newUser);
+                window.location.reload();
+            });
+    }
+
     return (
         <div className="admin-user" ref={ref}>
             <Header hide={false} />
@@ -197,7 +227,12 @@ const AdminUser = () => {
                         <label className="admin-user-name">{user.pseudo}</label>
                         <label className="admin-user-email">{user.email}</label>
                         <label className="admin-user-creation">Date de création: {formatDate(user.registrationDateTime)}</label>
-                        <label className="admin-user-role">Rôle: <b>{user.role === 0 ? 'Utilisateur' : 'Administrateur'}</b></label>
+                        <div className="admin-user-role-container">
+                            <label className="admin-user-role">Rôle: <b>{user.role === 0 ? 'Utilisateur' : 'Administrateur'}</b></label>
+                            <button className="admin-user-role-button" onClick={changeRole}>
+                                {user.role === 0 ? 'Promouvoir' : 'Rétrograder'}
+                            </button>
+                        </div> 
                     </div>
                 </div>
                 <div className="admin-user-total">
@@ -240,8 +275,7 @@ const AdminUser = () => {
                             <label className="admin-user-game-name">{game.name}</label>
                             <label className="admin-user-game-price">{game.price}€</label>
                         </div>
-                    ))
-                    }
+                    ))}
                 </div>
             </div>
         </div>

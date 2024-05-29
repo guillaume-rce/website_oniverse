@@ -87,3 +87,19 @@
     border-radius: 50%;
     animation: sparkle 1.5s linear infinite;
 }
+
+.GamePres_video-container {
+    width: 400px;
+    height: 300px;
+    border-radius: 16px;
+    margin: auto 0;
+    display: block;
+}
+
+.GamePres_video {
+    width: 400px;
+    height: 300px;
+    border-radius: 16px;
+    margin: auto 0;
+    display: block;
+}
