@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useCart } from '../../CartContext';
 import './Item.css';
 
 function Item({ item }) {
+    const { canBePurchased } = useCart();
     const { addToCart, removeFromCart, removeAllFromCart } = useCart();
 
     return (
@@ -18,7 +18,7 @@ function Item({ item }) {
                 <button onClick={() => removeFromCart(item.name)}
                     disabled={item.quantity === 1} className="quantity_btn">-</button>
                 <label className="quantity_label">{item.quantity}</label>
-                <button onClick={() => addToCart(item)} className="quantity_btn">+</button>
+                <button onClick={() => addToCart(item)} className="quantity_btn" disabled={!canBePurchased(item)}>+</button>
             </div>
             <div className="price">
                 <label className="price_label">{item.price.toFixed(2)} €</label>

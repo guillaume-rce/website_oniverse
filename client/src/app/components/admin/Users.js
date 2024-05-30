@@ -10,9 +10,6 @@ const Users = ({ users }) => {
                     <User key={user.id} user={user} />
                 ))}
             </div>
-            <button className="view-all-users"
-                onClick={() => window.location.href = '/admin-users'}
-            >Voir tous les utilisateurs</button>
         </div>
     );
 }

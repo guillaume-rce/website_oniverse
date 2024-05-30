@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Header from '../../components/Header';
 import defaultAvatar from '../../../res/default/profile.jpg';
 import './AdminUser.css';
+import UserAnalyse from "../../components/admin/UserAnalyse";
 
 const AdminUser = () => {
     var { id } = useParams();
@@ -61,6 +62,16 @@ const AdminUser = () => {
                 }
 
                 setOrders(data);
+
+                let totalV = 0;
+                data.forEach((order) => {
+                    totalV += order.total;
+                });
+
+                setTotal(totalV);
+
+                let totalOrdersV = data.length;
+                setTotalOrders(totalOrdersV);
             });
 
         fetch(`http://localhost:3001/orders/items/user/${id}`)
@@ -86,6 +97,13 @@ const AdminUser = () => {
                 }
 
                 setItems(data);
+
+                let totalItemsV = 0;
+                data.forEach((item) => {
+                    totalItemsV += item.quantity;
+                });
+
+                setTotalItems(totalItemsV);
             });
 
         fetch(`http://localhost:3001/user/${id}/games`)
@@ -124,52 +142,6 @@ const AdminUser = () => {
         };
         window.requestAnimationFrame(step);
     }
-
-    useEffect(() => {
-        if (items.length === 0) {
-            return;
-        }
-
-        let total = 0;
-        let totalOrders = 0;
-        let totalItems = 0;
-
-        totalOrders = orders.length;
-        orders.forEach((order) => {
-            total += order.total;
-        });
-
-        items.forEach((item) => {
-            totalItems += item.quantity;
-        });
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !isAnimated) {
-                    animateValue(0, total, 2000, setTotal);
-                    animateValue(0, totalOrders, 2000, setTotalOrders);
-                    animateValue(0, totalItems, 2000, setTotalItems);
-
-                    setIsAnimated(true);
-                }
-            },
-            {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.5
-            }
-        );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => {
-            if (ref.current) {
-                observer.unobserve(ref.current);
-            }
-        };
-    }, [items, orders, isAnimated]);
 
     if (error) {
         return <div>Error: {error}</div>;
@@ -214,6 +186,27 @@ const AdminUser = () => {
             });
     }
 
+    const deleteAccount = () => {
+        fetch(`http://localhost:3001/user/${id}`, {
+            method: 'DELETE'
+        })
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to delete user', error);
+                    setError('Failed to delete user');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No data found');
+                    return;
+                }
+
+                window.location.href = '/admin';
+            });
+    }
+
     return (
         <div className="admin-user" ref={ref}>
             <Header hide={false} />
@@ -223,7 +216,18 @@ const AdminUser = () => {
                 <div className="admin-user-info">
                     <img src={user.image || defaultAvatar} alt="user" className="admin-user-avatar" />
                     <div className="admin-user-info-content">
-                        <label className="admin-user-id">ID: #{user.id}</label>
+                        <div className="admin-user-id-delete">
+                            <label className="admin-user-id">ID: #{user.id}</label>
+                            <button className="admin-user-delete"
+                                onMouseOver={() => document.getElementById('delete-user-icon').style.fill = '#fff'}
+                                onMouseOut={() => document.getElementById('delete-user-icon').style.fill = '#e69005'}
+                                onClick={deleteAccount}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e69005" class="w-6 h-6" className="admin-user-delete-icon"
+                                    id="delete-user-icon">
+                                    <path d="M19 6H15V4H9V6H5V8H19V6ZM17 10H7L8 18H16L17 10Z" />
+                                </svg>
+                            </button>
+                        </div>
                         <label className="admin-user-name">{user.pseudo}</label>
                         <label className="admin-user-email">{user.email}</label>
                         <label className="admin-user-creation">Date de création: {formatDate(user.registrationDateTime)}</label>
@@ -232,7 +236,7 @@ const AdminUser = () => {
                             <button className="admin-user-role-button" onClick={changeRole}>
                                 {user.role === 0 ? 'Promouvoir' : 'Rétrograder'}
                             </button>
-                        </div> 
+                        </div>
                     </div>
                 </div>
                 <div className="admin-user-total">
@@ -253,32 +257,36 @@ const AdminUser = () => {
             <div className="admin-user-orders">
                 <label className="title">Commandes</label>
                 <div className="admin-user-orders-content">
-                    { orders.length === 0 ? <label>Aucune commande trouvée</label> :
-                    orders.map((order) => (
-                        <div key={order.id} className="admin-user-order" onClick={() => window.location.href = `/admin/orders/${order.id}`}>
-                            <label className="admin-user-order-id">ID: #{order.id}</label>
-                            <label className="admin-user-order-date">Date: {formatDate(order.creationDateTime)}</label>
-                            <label className="admin-user-order-total">Total: {order.total}€</label>
-                        </div>
-                    ))
+                    {orders.length === 0 ? <label>Aucune commande trouvée</label> :
+                        orders.map((order) => (
+                            <div key={order.id} className="admin-user-order" onClick={() => window.location.href = `/admin/orders/${order.id}`}>
+                                <label className="admin-user-order-id">ID: #{order.id}</label>
+                                <label className="admin-user-order-date">Date: {formatDate(order.creationDateTime)}</label>
+                                <label className="admin-user-order-total">Total: {order.total}€</label>
+                            </div>
+                        ))
                     }
                 </div>
+            </div>
+            <div className="admin-user-analyse">
+                <label className="title">Analyse des commandes</label>
+                <UserAnalyse userId={id} />
             </div>
             <div className="admin-user-games">
                 <label className="title">Jeux</label>
                 <div className="admin-user-games-content">
-                    { games.length === 0 ? <label className="admin-user-no-games">Aucun jeu trouvé</label> :
-                    games.map((game) => (
-                        <div key={game.id} className="admin-user-game" onClick={() => window.location.href = `/admin/games/${game.id}`}>
-                            <label className="admin-user-game-id">#{game.id}</label>
-                            <img src={game.logo ? game.logo.path : game.image.path} alt="game" className="admin-user-game-image" />
-                            <label className="admin-user-game-name">{game.name}</label>
-                            <label className="admin-user-game-price">{game.price}€</label>
-                        </div>
-                    ))}
+                    {games.length === 0 ? <label className="admin-user-no-games">Aucun jeu trouvé</label> :
+                        games.map((game) => (
+                            <div key={game.id} className="admin-user-game" onClick={() => window.location.href = `/admin/games/${game.id}`}>
+                                <label className="admin-user-game-id">#{game.id}</label>
+                                <img src={game.logo ? game.logo.path : game.image.path} alt="game" className="admin-user-game-image" />
+                                <label className="admin-user-game-name">{game.name}</label>
+                                <label className="admin-user-game-price">{game.price}€</label>
+                            </div>
+                        ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

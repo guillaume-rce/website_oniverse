@@ -59,6 +59,15 @@ export const CartProvider = ({ children }) => {
         setCart([]);
     }
 
+    const canBePurchased = (game) => {
+        // Check if the game can be purchased
+        if (!game.stock) {
+            return false;
+        }
+        const cartGame = cart.find((cartGame) => cartGame.name === game.name);
+        return !cartGame || cartGame.quantity < game.stock;
+    }
+
     /*
     The cart looks like this:
     [
@@ -72,6 +81,7 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         removeAllFromCart,
         clearCart,
+        canBePurchased,
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

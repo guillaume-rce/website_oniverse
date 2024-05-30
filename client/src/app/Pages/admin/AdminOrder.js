@@ -90,13 +90,24 @@ const AdminOrder = () => {
                 .then(
                     (response) => response.json(),
                     (error) => {
-                        console.error('Failed to fetch user', error);
-                        setError('Failed to fetch user');
+                        // Si l'utilisateur n'existe pas (erreur 404), on ne fait rien
+                        if (error && error.status === 404) {
+                            setUser(null);
+                            return;
+                        } else {
+                            console.error('Failed to fetch user', error);
+                            setError('Failed to fetch user');
+                        }
                     }
                 )
                 .then((data) => {
                     if (!data) {
                         console.error('No user found');
+                        return;
+                    }
+
+                    if (data.error && data.error === 'Aucun utilisateur trouvé avec cet ID.') {
+                        setUser(null);
                         return;
                     }
 
@@ -184,7 +195,7 @@ const AdminOrder = () => {
         };
     }, [order, isAnimated]);
 
-    if (!order || !delivery || !items || !user) {
+    if (!order || !delivery || !items) {
         return <div>Loading...</div>;
     }
 
@@ -303,17 +314,23 @@ const AdminOrder = () => {
                 </div>
                 <div className="order-info-card">
                     <label className="title" style={{ fontSize: '1.5em' }}>Information de l'utilisateur</label>
-                    <div className="user-info-content">
-                        <div className="user-info-right">
-                            <img className="user-avatar" src={user.image} alt="user-avatar" />
+                    {user ?
+                        <div className="user-info-content">
+                            <div className="user-info-right">
+                                <img className="user-avatar" src={user.image} alt="user-avatar" />
+                            </div>
+                            <div className="user-info-left">
+                                <label className="user-info-id">ID #{user.id}</label>
+                                <label className="user-info-pseudo">{user.pseudo}</label>
+                                <label className="user-info-email">{user.email}</label>
+                                <label className="user-date">Créé le : {formatDate(user.registrationDateTime)}</label>
+                            </div>
                         </div>
-                        <div className="user-info-left">
-                            <label className="user-info-id">ID #{user.id}</label>
-                            <label className="user-info-pseudo">{user.pseudo}</label>
-                            <label className="user-info-email">{user.email}</label>
-                            <label className="user-date">Créé le : {formatDate(user.registrationDateTime)}</label>
+                        :
+                        <div style={{ display:'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
+                            <label className="user-info-id">Aucun utilisateur trouvé... Il a peut-être été supprimé. 😒</label>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
             <div className="order-items-list">

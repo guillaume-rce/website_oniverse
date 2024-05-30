@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 function GamePres({ game }) {
     const { name, description, image, video } = game;
     const videoPath = video;
-    const { addToCart } = useCart();
+    const { addToCart, canBePurchased } = useCart();
 
     const buttonRef = useRef(null);
 
@@ -64,25 +64,27 @@ function GamePres({ game }) {
             {
                 !videoPath ? (
                     <div className="GamePres" style={{ backgroundImage: `url(${image["path"]})` }}>
-                        <div className="GamePres_overlay">
-                            <p className="GamePres_title">{name}</p>
-                            <p className="GamePres_desc">{description}</p>
-                            <button className="GamePres_add" ref={buttonRef} onClick={(e) => { addToCart(game); handleRippleEffect(e); }}>Ajouter au panier</button>
-                        </div>
                     </div>
                 ) : (
-                    <div className="GamePres">
-                        <video className="GamePres" autoPlay loop muted>
-                            <source src={videoPath} type="video/mp4" />
-                        </video>
-                        <div className="GamePres_overlay">
-                            <p className="GamePres_title">{name}</p>
-                            <p className="GamePres_desc">{description}</p>
-                            <button className="GamePres_add" ref={buttonRef} onClick={(e) => { addToCart(game); handleRippleEffect(e); }}>Ajouter au panier</button>
-                        </div>
-                    </div>
+                    <video className="GamePres" autoPlay loop muted>
+                        <source src={videoPath} type="video/mp4" />
+                    </video>
                 )
             }
+            <div className="GamePres_overlay">
+                <p className="GamePres_title">{name}</p>
+                <p className="GamePres_desc">{description}</p>
+                {
+                    canBePurchased(game) ?
+                    <button className="GamePres_add" ref={buttonRef} onClick={(e) => { addToCart(game); handleRippleEffect(e); }}>
+                        Ajouter au panier
+                    </button>
+                    :
+                    <button className="GamePres_add_disabled">
+                        Indisponible 😢
+                    </button>
+                }
+            </div>
         </div>
 
     );

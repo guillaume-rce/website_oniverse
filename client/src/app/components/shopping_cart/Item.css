@@ -59,6 +59,21 @@
     cursor: pointer;
     border: none;
     background: none;
+
+    transition: all 0.2s;
+}
+
+.quantity_btn:hover {
+    color: #e6a005;
+}
+
+.quantity_btn:active {
+    transform: scale(1.1);
+}
+
+.quantity_btn:disabled {
+    color: #777;
+    cursor: default;
 }
 
 .quantity_label {

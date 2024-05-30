@@ -66,6 +66,20 @@
     background-color: #f8c064;
 }
 
+.game-add-component-disabled {
+    height: 100%;
+    aspect-ratio: 1/1;
+
+    border-radius: 5px;
+    background-color: #fcc771;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 10px;
+    border: none;
+    cursor: not-allowed;
+    transition: all 0.3s;
+}
+
 .game-tags-component {
     display: flex;
     flex-direction: row;

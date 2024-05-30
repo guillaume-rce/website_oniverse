@@ -408,6 +408,55 @@ router.get('/:id', (req, res, next) => {
 
 /**
  * @swagger
+ * /user/{id}:
+ *   delete:
+ *     summary: Delete a user by ID without checking for references
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the user to delete
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User deleted successfully."
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error during the deletion process
+ */
+router.delete('/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
+        const [result] = await internal.promise().query(deleteUserQuery, [userId]);
+
+        if (result.affectedRows === 0) {
+            // If no rows affected, the user was not found
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        // Return success message
+        res.status(200).json({ message: 'User deleted successfully.' });
+    } catch (error) {
+        console.error('Error during DELETE query:', error);
+        res.status(500).json({ error: 'Server error during the deletion process.' });
+    }
+});
+
+/**
+ * @swagger
  * /user/{id}/games:
  *   get:
  *     summary: Retrieve all unique games ordered by a specific user

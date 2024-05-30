@@ -134,11 +134,44 @@ const videoUpload = multer({
  * @swagger
  * /games:
  *   get:
- *     summary: Retrieve a list of games with their images, logos, and tags
+ *     summary: Retrieve a list of games with their images, logos, tags, and videos
  *     tags: [Games]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Number of games per page for pagination
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter games by name (partial or full match)
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *           format: float
+ *         required: false
+ *         description: Filter games by minimum price
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *           format: float
+ *         required: false
+ *         description: Filter games by maximum price
  *     responses:
  *       200:
- *         description: A list of games
+ *         description: A list of games, optionally filtered and paginated
  *         content:
  *           application/json:
  *             schema:
@@ -149,7 +182,13 @@ const videoUpload = multer({
  *         description: Server error
  */
 router.get('/', (req, res) => {
-    const query = `
+    let { page, pageSize, name, minPrice, maxPrice } = req.query;
+
+    // Initialisation de la pagination
+    const limit = pageSize ? parseInt(pageSize) : undefined;
+    const offset = page ? (parseInt(page) - 1) * parseInt(pageSize) : undefined;
+
+    let query = `
         SELECT 
             games.id, games.name, games.description, games.price, games.stock, games.url, games.video,
             mainImages.id AS image_id, mainImages.path AS image_path,
@@ -161,9 +200,34 @@ router.get('/', (req, res) => {
         LEFT JOIN images AS mainImages ON games.image = mainImages.id
         LEFT JOIN images AS logoImages ON games.logo = logoImages.id
         LEFT JOIN tags_association ON games.id = tags_association.idGame
-        LEFT JOIN tags ON tags_association.idTag = tags.id`;
+        LEFT JOIN tags ON tags_association.idTag = tags.id
+        WHERE 1 = 1
+    `;
 
-    content.query(query, (error, results) => {
+    let queryParameters = [];
+
+    // Ajout des filtres basés sur les paramètres spécifiés
+    if (name) {
+        query += ` AND games.name LIKE ?`;
+        queryParameters.push(`%${name}%`);
+    }
+    if (minPrice) {
+        query += ` AND games.price >= ?`;
+        queryParameters.push(minPrice);
+    }
+    if (maxPrice) {
+        query += ` AND games.price <= ?`;
+        queryParameters.push(maxPrice);
+    }
+
+    // Ajout de la pagination si les paramètres sont spécifiés
+    if (limit !== undefined && offset !== undefined) {
+        query += ` LIMIT ? OFFSET ?`;
+        queryParameters.push(limit, offset);
+    }
+
+    // Exécution de la requête
+    content.query(query, queryParameters, (error, results) => {
         if (error) {
             console.error('Error during SELECT query:', error);
             res.status(500).json({ error: 'Server error during SELECT query.' });

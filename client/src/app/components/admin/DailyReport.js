@@ -27,6 +27,26 @@ const DailyReport = ({ orders }) => {
         }
     });
 
+    // Add missing days
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const key = `${day}/${month}/${year}`;
+        if (!data.find(d => d.name === key)) {
+            data.push({ name: key, Orders: 0, Total: 0 });
+        }
+    }
+
+    data.sort((a, b) => {
+        const aDate = new Date(a.name.split('/').reverse().join('/'));
+        const bDate = new Date(b.name.split('/').reverse().join('/'));
+        return aDate - bDate;
+    });
+
     return (
         <div className="daily-report">
             <div className="report-header">
