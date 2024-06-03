@@ -4,6 +4,7 @@ import DailyReport from '../components/admin/DailyReport';
 import LastOrders from '../components/admin/LastOrders';
 import Games from '../components/admin/Games';
 import DeliveryMethods from '../components/admin/DeliveryMethods';
+import DiscountCodes from '../components/admin/DiscountCodes';
 import Info from '../components/admin/Info';
 import Users from '../components/admin/Users';
 
@@ -39,6 +40,7 @@ const Admin = () => {
     const [games, setGames] = useState([]);
     const [users, setUsers] = useState([]);
     const [delivery, setDelivery] = useState([]);
+    const [discountCodes, setDiscountCodes] = useState([]);
 
     useEffect(() => {
         fetch('http://localhost:3001/orders?sortOrder=asc')
@@ -125,6 +127,22 @@ const Admin = () => {
 
                 setDelivery(data);
             });
+        fetch('http://localhost:3001/discount-codes')
+            .then(
+                (response) => response.json(),
+                (error) => {
+                    console.error('Failed to fetch discount codes', error);
+                    setError('Failed to fetch discount codes');
+                }
+            )
+            .then((data) => {
+                if (!data) {
+                    console.error('No discount codes found');
+                    return;
+                }
+
+                setDiscountCodes(data);
+            });
     }, []);
 
     if (!user) {
@@ -135,7 +153,7 @@ const Admin = () => {
         window.location.href = '/';
     }
 
-    if (orders.length === 0 || games.length === 0 || users.length === 0 || delivery.length === 0) {
+    if (games.length === 0 || users.length === 0 || delivery.length === 0) {
         return <div>Loading...</div>;
     }
 
@@ -167,6 +185,9 @@ const Admin = () => {
                 </div>
                 <div style={{ height: '160px', width: '100%' }}>
                     <DeliveryMethods deliveryMethods={delivery} />
+                </div>
+                <div style={{ height: '160px', width: '100%' }}>
+                    <DiscountCodes />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', height: '200px', width: '100%' }}>
                     <Info title="Total orders" num={totalSell} type="orders" icon="https://img.icons8.com/ios/452/shopping-cart.png" />

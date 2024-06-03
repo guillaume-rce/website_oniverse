@@ -2,15 +2,9 @@
 
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
 
 // Configuration de la base de données
-const content = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'content',
-});
+const content = require('../config/content');
 
 /**
  * @swagger

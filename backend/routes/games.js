@@ -1,15 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
 const multer = require('multer');
-
-// Database configuration
-const content = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'content',
-});
+const content = require('../config/content');
+const internal = require('../config/internal');
 
 // File storage configuration
 const storage = multer.diskStorage({
@@ -634,18 +627,8 @@ router.get('/:id/ordered', async (req, res) => {
             return res.status(404).json({ error: 'Game not found.' });
         }
 
-        // If the game exists, check if it has been part of any orders
-        const internalDataConnection = mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-            database: 'internal_data',
-        });
-
         const orderCheckQuery = 'SELECT 1 FROM order_item WHERE item_id = ? LIMIT 1;';
-        const [orderExists] = await internalDataConnection.promise().query(orderCheckQuery, [gameId]);
-
-        internalDataConnection.end();
+        const [orderExists] = await internal.promise().query(orderCheckQuery, [gameId]);
 
         if (orderExists.length > 0) {
             // If the game is part of an order, return true
@@ -898,16 +881,8 @@ router.delete('/:id', async (req, res) => {
     const gameId = req.params.id;
 
     try {
-        // Connect to the internal_data database to check if the game is part of any orders
-        const internalDataConnection = mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-            database: 'internal_data',
-        });
-
         const orderCheckQuery = `SELECT 1 FROM order_item WHERE item_id = ? LIMIT 1;`;
-        const [orderExists] = await internalDataConnection.promise().query(orderCheckQuery, [gameId]);
+        const [orderExists] = await internal.promise().query(orderCheckQuery, [gameId]);
 
         if (orderExists.length > 0) {
             // If the game is part of an order, prevent deletion
@@ -923,9 +898,6 @@ router.delete('/:id', async (req, res) => {
                 res.status(404).json({ error: 'Game not found.' });
             }
         }
-
-        // Close the internal_data connection if no longer needed
-        internalDataConnection.end();
 
     } catch (error) {
         console.error('Error during the deletion process:', error);

@@ -64,6 +64,26 @@
     box-sizing: border-box;
 }
 
+.summary-apply {
+    font-size: 1rem;
+    color: #000;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 3px;
+    background-color: #ffd821;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.summary-apply:hover {
+    background-color: #ffa415;
+}
+
+.discount-error {
+    font-size: 1rem;
+    color: #f00;
+}
+
 .total {
     font-size: 2rem;
     font-weight: bold;
@@ -75,6 +95,29 @@
     color: #555;
 }
 
+.total-label {
+    font-size: 1.5rem;
+    color: #777;
+}
+
+.total-amount-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+}
+
+.total-amount {
+    font-size: 1.8rem;
+    color: #000;
+}
+
+.discount-total {
+    font-size: 1.2rem;
+    color: #777;
+}
+
 .checkout {
     font-size: 1.5rem;
     margin-top: 20px;
@@ -84,6 +127,11 @@
     color: #000;
     border: none;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.checkout:hover {
+    transform: scale(1.05);
 }
 
 .checkout:disabled {

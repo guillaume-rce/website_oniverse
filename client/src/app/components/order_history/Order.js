@@ -9,6 +9,7 @@ const Order = ({ order }) => {
     const [items, setItems] = useState([]);
     const [deliveryMethod, setDeliveryMethod] = useState("");
     const [orderDetails, setOrderDetails] = useState(order);
+    const [discount, setDiscount] = useState(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -39,7 +40,23 @@ const Order = ({ order }) => {
                 setError('Failed to fetch items for order');
                 setItems([]);  // Ensure items is always an array
             });
-    }, [orderDetails.id]);
+
+        fetch(`http://localhost:3001/discount-codes/${orderDetails.discountCode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Failed to fetch discount code', orderDetails.discountCode, data.error);
+                    setError('Failed to fetch discount code');
+                    return;
+                }
+
+                setDiscount(data);
+            })
+            .catch(error => {
+                console.error('Failed to fetch discount code', orderDetails.discountCode, error);
+                setError('Failed to fetch discount code');
+            });
+    }, [orderDetails.id, orderDetails.discountCode]);
 
     useEffect(() => {
         fetch(`http://localhost:3001/delivery/${orderDetails.deliveryMethod}`)
@@ -137,6 +154,7 @@ const Order = ({ order }) => {
                     <Item key={item.id} item={item} />
                 ))}
             </div>
+            {discount && <label className="order-history-discount">Code de réduction: <b>{discount.name}</b> - {discount.value}%</label>}
         </div>
     );
 }

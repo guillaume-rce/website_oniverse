@@ -3,16 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const mysql = require('mysql2');
 const multer = require('multer');
-
-// Setup for database
-const internal = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'internal_data',
-});
+const internal = require('../config/internal');
 
 // Set up file storage
 const storage = multer.diskStorage({

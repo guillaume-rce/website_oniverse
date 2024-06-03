@@ -25,7 +25,7 @@ function GameCard(props) {
 
     return (
         <div className="home-game-card">
-            <h2 className="game-card-title">{name}</h2>
+            <label className="game-card-title">{name}</label>
             <img src={image_path} alt={name} className="game-card-image" />
             <div className="game-card-buy">
                 <p className="game-card-price">Prix : {price}€</p>

@@ -15,6 +15,10 @@ const Games = () => {
 
     const [sort, setSort] = useState('asc');
 
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const gamesPerPage = 5;
+
     useEffect(() => {
         fetch('http://localhost:3001/games')
             .then(
@@ -85,6 +89,7 @@ const Games = () => {
         });
 
         setGamesFiltered(filteredGames);
+        setCurrentPage(1); // Reset to first page when filters are applied
     };
 
     const priceFilterGames = (minPrice, maxPrice) => {
@@ -104,6 +109,7 @@ const Games = () => {
         const filteredGames = games.filter((game) => game.price >= minPrice && game.price <= maxPrice);
 
         setGamesFiltered(filteredGames);
+        setCurrentPage(1); // Reset to first page when filters are applied
     };
 
     const sortGames = () => {
@@ -111,7 +117,14 @@ const Games = () => {
 
         const sortedGames = gamesFiltered.sort((a, b) => sort === 'asc' ? a.price - b.price : b.price - a.price);
         setGamesFiltered(sortedGames);
-    }
+    };
+
+    // Calculate current games to display
+    const indexOfLastGame = currentPage * gamesPerPage;
+    const indexOfFirstGame = indexOfLastGame - gamesPerPage;
+    const currentGames = gamesFiltered.slice(indexOfFirstGame, indexOfLastGame);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div style={{ width: '100%', minHeight: '100%' }}>
@@ -158,10 +171,20 @@ const Games = () => {
                     </div>
                 </div>
                 <div className='games-container'>
-                    {gamesFiltered.length === 0 ? <label className='no-games'>Aucun jeu trouvé 😭</label> :
-                        gamesFiltered.map((game) => (
+                    {currentGames.length === 0 ? <label className='no-games'>Aucun jeu trouvé 😭</label> :
+                        currentGames.map((game) => (
                             <Game key={game.id} game={game} addToCart={addToCart} height={150} />
                         ))}
+                </div>
+                <div className='pagination'>
+                    {Array.from({ length: Math.ceil(gamesFiltered.length / gamesPerPage) }, (_, index) => (
+                        <button key={index + 1} onClick={() => paginate(index + 1)} className={currentPage === index + 1 ? 'active' : ''} 
+                            style={{ borderRadius: '5px', transition: '0.3s'}}
+                            onMouseEnter={(event) => event.target.style.backgroundColor = '#303f9f'}
+                            onMouseLeave={(event) => event.target.style.backgroundColor = '#3f51b5'}>
+                            {index + 1}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>

@@ -63,6 +63,11 @@
     font-size: 1.2rem;
     font-weight: 600;
     color: #333;
+
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .game-input {

@@ -15,6 +15,7 @@ const AdminOrder = () => {
     const [order, setOrder] = useState(null);
     const [user, setUser] = useState(null);
     const [delivery, setDelivery] = useState(null);
+    const [discount, setDiscount] = useState(null);
     const [items, setItems] = useState(null);
 
     const [digitalItems, setDigitalItems] = useState([]);
@@ -113,6 +114,25 @@ const AdminOrder = () => {
 
                     setUser(data);
                 });
+            
+            if (order.discountCode !== 0) {
+                fetch(`http://localhost:3001/discount-codes/${order.discountCode}`)
+                    .then(
+                        (response) => response.json(),
+                        (error) => {
+                            console.error('Failed to fetch discount', error);
+                            setError('Failed to fetch discount');
+                        }
+                    )
+                    .then((data) => {
+                        if (!data) {
+                            console.error('No discount found');
+                            return;
+                        }
+
+                        setDiscount(data);
+                    });
+            }
         }
 
         if (items) {
@@ -246,7 +266,7 @@ const AdminOrder = () => {
             })
         })
     }
-
+    console.log('discount:', discount);
     return (
         <div className="admin-order" ref={ref}>
             <Header hide={false} />
@@ -258,7 +278,7 @@ const AdminOrder = () => {
             <div className="order-items">
                 <div className="order-reports">
                     <label className="title" style={{ fontSize: '1.5em' }}>Rapport de commande</label>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="60%">
                         <PieChart>
                             <Pie
                                 data={data}
@@ -275,14 +295,14 @@ const AdminOrder = () => {
                                 ))}
                             </Pie>
                             <Tooltip />
-                        // Draw the total cost in the center of the pie chart
-                            <text x={"50%"} y={"50%"} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '2.5em', fontWeight: 'bold' }}>
+                            <text x={"50%"} y={"50%"} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '2.2em', fontWeight: 'bold' }}>
                                 {totalCost}€
                             </text>
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="order-payement-method">
                         <label className="info">Payé par: {order.paymentMode}</label>
+                        {discount ? <label className="admin-discount">Réduction: <b>{discount.name}</b> - {discount.value}%</label> : null}
                     </div>
                 </div>
                 <div className="order-status">

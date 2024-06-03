@@ -9,6 +9,7 @@ const ShoppingCart = () => {
     const [total, setTotal] = useState(0);
     const [deliveryMethod, setDeliveryMethod] = useState();
     const [deliveryMethods, setDeliveryMethods] = useState();
+    const [discount, setDiscount] = useState(null);
 
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
 
@@ -39,11 +40,11 @@ const ShoppingCart = () => {
                         setDeliveryMethod={setDeliveryMethod} setCheckout={
                             // Verify if the user is connected
                             userId ? setCheckout : () => window.location.href = '/auth'
-                        } setTotal={setTotal} />
+                        } setTotal={setTotal} applyDiscount={setDiscount} />
 
                 </div>
             ) : (
-                <Checkout deliveryMethod={deliveryMethod} total={total} setCheckout={setCheckout} />
+                <Checkout deliveryMethod={deliveryMethod} total={total} discount={discount} setCheckout={setCheckout} />
             )}
         </div>
     );

@@ -1,16 +1,6 @@
-// routes/delivery.js
-
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
-
-// Setup for database
-const internal = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'internal_data',
-});
+const internal = require('../config/internal');
 
 /**
  * @swagger

@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import './Checkout.css';
 
-const Checkout = ({ deliveryMethod, total, setCheckout }) => {
+const Checkout = ({ deliveryMethod, total, discount, setCheckout }) => {
     const { cart, clearCart } = useCart();
     const [name, setName] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
@@ -33,6 +33,7 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
         const items = cart.map((item) => ({
             item_id: item.id,
             quantity: item.quantity,
+            price: item.price,
             isDigital: item.isDigital || true
         }));
 
@@ -46,6 +47,7 @@ const Checkout = ({ deliveryMethod, total, setCheckout }) => {
             state: 'CONFIRMED',
             deliveryMethod: deliveryMethod.id,
             total,
+            discountCode: discount ? discount.id: 0,
             items
         };
 

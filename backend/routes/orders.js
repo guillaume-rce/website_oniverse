@@ -2,15 +2,8 @@
 
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
-
-// Setup for database
-const internal = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'internal_data',
-});
+const internal = require('../config/internal');
+const content = require('../config/content');
 
 /**
  * @swagger
@@ -35,6 +28,7 @@ const internal = mysql.createConnection({
  *         - zipcode
  *         - address
  *         - paymentMode
+ *         - discountCode
  *         - state
  *         - deliveryMethod
  *         - total
@@ -51,21 +45,24 @@ const internal = mysql.createConnection({
  *           description: The user ID associated with the order.
  *         name:
  *           type: string
- *           description: The recipient's full name. Stored as text in the database.
+ *           description: The recipient's full name.
  *         country:
  *           type: string
- *           description: The recipient's country. Stored as text in the database.
+ *           description: The recipient's country.
  *         zipcode:
  *           type: string
- *           description: The postal code for the delivery address. Stored as tinytext in the database.
+ *           description: The postal code for the delivery address.
  *         address:
  *           type: string
- *           description: The full delivery address. Stored as text in the database.
+ *           description: The full delivery address.
  *         paymentMode:
  *           type: string
  *           enum: [CB, PAYPAL]
- *           default: CB
- *           description: The payment method used. Defaults to 'CB' if not specified.
+ *           description: The payment method used.
+ *         discountCode:
+ *           type: integer
+ *           format: int32
+ *           description: The discount code used, if any.
  *         state:
  *           type: string
  *           enum: ['CONFIRMED', 'IN_PREPARATION', 'SEND', 'RECEIVED', 'CLOSED', 'MITIGE']
@@ -76,15 +73,15 @@ const internal = mysql.createConnection({
  *           description: The identifier for the delivery method used.
  *         total:
  *           type: integer
- *           description: The total cost of the order, stored as an integer.
+ *           description: The total cost of the order.
  *         creationDateTime:
  *           type: string
  *           format: date-time
- *           description: The date and time when the order was created, defaults to the current timestamp.
+ *           description: The date and time when the order was created.
  *         lastUpdateDateTime:
  *           type: string
  *           format: date-time
- *           description: The date and time when the order was last updated, defaults to the current timestamp.
+ *           description: The date and time when the order was last updated.
  *     Item:
  *       type: object
  *       required:
@@ -92,6 +89,7 @@ const internal = mysql.createConnection({
  *         - order_id
  *         - item_id
  *         - quantity
+*          - cost
  *         - isDigital
  *       properties:
  *         id:
@@ -106,6 +104,10 @@ const internal = mysql.createConnection({
  *         quantity:
  *           type: integer
  *           description: Quantity of the item ordered.
+ *         cost:
+ *           type: number
+ *           format: float
+ *           description: The cost of the item at the time of the order.
  *         isDigital:
  *           type: boolean
  *           description: Indicates if the item is digital.
@@ -198,7 +200,7 @@ router.get('/', (req, res) => {
  *         description: Server error
  */
 router.post('/', (req, res) => {
-    const { user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total, items } = req.body;
+    const { user, name, country, zipcode, address, paymentMode, discountCode, state, deliveryMethod, total, items } = req.body;
     internal.beginTransaction(async (err) => {
         if (err) {
             console.error('Error initiating transaction:', err);
@@ -206,13 +208,18 @@ router.post('/', (req, res) => {
         }
 
         try {
-            const insertOrderQuery = `INSERT INTO \`order\` (user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-            const [orderResult] = await internal.promise().query(insertOrderQuery, [user, name, country, zipcode, address, paymentMode, state, deliveryMethod, total]);
+            const insertOrderQuery = `INSERT INTO \`order\` (user, name, country, zipcode, address, paymentMode, discountCode, state, deliveryMethod, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+            const [orderResult] = await internal.promise().query(insertOrderQuery, [user, name, country, zipcode, address, paymentMode, discountCode, state, deliveryMethod, total]);
             const orderId = orderResult.insertId;
 
-            const insertOrderItemQuery = `INSERT INTO order_item (order_id, item_id, quantity, isDigital) VALUES (?, ?, ?, ?);`;
+            const insertOrderItemQuery = `INSERT INTO order_item (order_id, item_id, quantity, cost, isDigital) VALUES (?, ?, ?, ?, ?);`;
             for (const item of items) {
-                await internal.promise().query(insertOrderItemQuery, [orderId, item.item_id, item.quantity, item.isDigital]);
+                await internal.promise().query(insertOrderItemQuery, [orderId, item.item_id, item.quantity, item.price, item.isDigital]);
+
+                const query = 'UPDATE games SET stock = ? WHERE id = ?';
+                const [stock] = await content.promise().query('SELECT stock FROM games WHERE id = ?', [item.item_id]);
+                const newStock = stock[0].stock - item.quantity;
+                await content.promise().query(query, [newStock, item.item_id]);            
             }
 
             internal.commit((err) => {

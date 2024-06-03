@@ -14,6 +14,7 @@ const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
 const deliveryRoutes = require('./routes/delivery');
 const tagsRoutes = require('./routes/tags');
+const discountCodeRoutes = require('./routes/discountCodes');
 
 app.use(cors());
 app.use('/public', express.static('public'));
@@ -31,5 +32,6 @@ app.use('/users', usersRoutes);
 app.use('/orders', ordersRoutes);
 app.use('/delivery', deliveryRoutes);
 app.use('/tags', tagsRoutes);
+app.use('/discount-codes', discountCodeRoutes);
 
 module.exports = app;

@@ -1,10 +1,10 @@
 .home-game-card {
     width: 350px;
-    height: 400px;
+    height: 420px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 10px;
     padding: 10px;
     border: 1px solid #e0e0e0;
@@ -20,7 +20,17 @@
 
 .game-card-title {
     font-size: 1.5em;
+    font-weight: bold;
     margin-bottom: 10px;
+    width: 100%;
+    height: 60px;
+
+    text-align: center;
+    margin-top: 5px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .game-card-image {

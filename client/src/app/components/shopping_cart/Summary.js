@@ -5,9 +5,11 @@ import './Summary.css';
 function Summary(props) {
     const { cart } = useCart();
 
-    const { deliveryMethods, setCheckout, setDeliveryMethod, setTotal } = props;
+    const { deliveryMethods, setCheckout, setDeliveryMethod, setTotal, applyDiscount } = props;
     let { deliveryMethod } = props;
     const [deliveryCharge, setDeliveryCharge] = useState(deliveryMethod ? deliveryMethod.cost : 0);
+    const [discount, setDiscount] = useState(null);
+    const [discountError, setDiscountError] = useState('');
 
     if (!deliveryMethod && deliveryMethods.length > 0) {
         deliveryMethod = deliveryMethods[0];
@@ -15,6 +17,31 @@ function Summary(props) {
     }
 
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    const localyApplyDiscount = (discountName) => {
+        if (!discountName) {
+            setDiscountError("S\'il vous plaît, entrez un code de réduction valide");
+            return;
+        }
+        if (discount) {
+            setDiscountError('Un code de réduction a déjà été appliqué');
+            return;
+        }
+
+        fetch('http://localhost:3001/discount-codes/name/' + discountName)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    setDiscountError('Code de réduction invalide');
+                    return;
+                }
+
+                setDiscount(data);
+                setDiscountError('');
+                console.log('Discount applied:', data);
+            });
+    }
+
 
     return (
         <div className="summary">
@@ -43,18 +70,36 @@ function Summary(props) {
                 </div>
                 <div className="summary-item" >
                     <span className="summary-discount">Discount code</span>
-                    <input type="text" placeholder="Enter your code" className="summary-input" />
+                    <input type="text" placeholder="Enter your code" className="summary-input" id="discount-code" />
+                    <button className="summary-apply"
+                        onClick={() => {
+                            localyApplyDiscount(document.getElementById('discount-code').value);
+                        }}>Apply</button>
+                    {discountError && <span className="discount-error">{discountError}</span>}
                 </div>
             </div>
             <div className="summary-item total">
-                <span>Total</span>
-                <span>{(total + deliveryCharge).toFixed(2)} €</span>
+                <label className="total-label">Total</label>
+
+                <div className="total-amount-container">
+                    <label className="total-amount">
+                        {(total + deliveryCharge).toFixed(2)} €
+                    </label>
+                    {
+                        discount && (
+                            <label className="discount-total">
+                                - {((total + deliveryCharge) * discount.value / 100).toFixed(2)} €
+                            </label>
+                        )
+                    }
+                </div>
             </div>
             <button className="checkout"
                 disabled={cart.length === 0}
                 onClick={() => {
-                    setTotal((total + deliveryCharge).toFixed(2));
+                    setTotal((total + deliveryCharge - (discount ? (total + deliveryCharge) * discount.value / 100 : 0)).toFixed(2));
                     setCheckout(true);
+                    discount && applyDiscount(discount);
                 }}>Checkout</button>
         </div>
     );
