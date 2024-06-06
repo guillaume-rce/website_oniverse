@@ -15,7 +15,7 @@
 - [License](#license)
 
 ## Description
-This project aims to create a website for Oniverse, a futuristic game development company. The website is an e-commerce platform that allows users to browse and purchase oniverse games. The website also includes a social part where users can interact with each other and share their experiences with the games, there is also a achievements system that rewards users for their activity on games.
+This project aims to create a website for Oniverse, a fictif game development company. The website is an e-commerce platform that allows users to browse and purchase oniverse games. The website also includes a social part where users can interact with each other and share their experiences with the games, there is also a achievements system that rewards users for their activity on games.
 
 This project comes from a school project, the goal is to create a e-commerce website but I wanted to go further and create a website that could be used by a real company and learn more about the technologies used in the project.
 
