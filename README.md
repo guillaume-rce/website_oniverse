@@ -54,5 +54,9 @@ If you want to be an admin, you can use the following credentials:
 - Email: admin2@admin.com
 - Password: Admin2
 
+## Equipe
+
+- [Guillaume ROCHE](https://github.com/guillaume-rce)
+
 ## License
 This project is licensed under a personalized license. **Please refer to the [LICENSE](LICENSE.md) file before using any part of this project.**
