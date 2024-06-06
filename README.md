@@ -54,7 +54,7 @@ If you want to be an admin, you can use the following credentials:
 - Email: admin2@admin.com
 - Password: Admin2
 
-## Equipe
+## Team
 
 - [Guillaume ROCHE](https://github.com/guillaume-rce)
 
