@@ -5,6 +5,7 @@ import './AllGames.css';
 
 function AllGames() {
     const [games, setGames] = useState([]);
+    const [orderedGames, setOrderedGames] = useState([]);
     const [orderItems, setOrderItems] = useState([]);
 
     useEffect(() => {
@@ -37,8 +38,7 @@ function AllGames() {
 
             let sortedGames = games.sort((a, b) => b.totalOrdered - a.totalOrdered);
             // Limit to 10 games
-            setGames(sortedGames.slice(0, 10));
-            console.log('Games:', games);
+            setOrderedGames(sortedGames.slice(0, 10));
         }
     }, [orderItems, games]);
     
@@ -50,7 +50,7 @@ function AllGames() {
         <div className="AllGames">
             <label className="AllGames_title">Nous jeux</label>
             <div className="AllGames_container">
-                {games.map((game, index) => (
+                {orderedGames.map((game, index) => (
                     <GameCard c_game={game} key={index} />
                 ))}
             </div>

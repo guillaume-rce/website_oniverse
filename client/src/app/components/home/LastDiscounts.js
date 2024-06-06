@@ -53,7 +53,7 @@ const LastDiscounts = () => {
                         className="discounts"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.3 }}
                     >
                         {publicDiscounts.map((discount) => (
                             <motion.div 
@@ -61,6 +61,7 @@ const LastDiscounts = () => {
                                 className="discount"
                                 whileHover={{ scale: 1.1, rotate: 3 }}
                                 whileTap={{ scale: 0.95, rotate: -3 }}
+                                transition={{ duration: 0.2 }}
                                 onClick={() => copyToClipboard(discount.name)}
                             >
                                 <div className="discount-code-name">{discount.name}</div>

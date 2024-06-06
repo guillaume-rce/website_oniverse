@@ -5,7 +5,7 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "Oniverse API",
-      version: "0.2.0",
+      version: "1.0.0",
     },
   },
   apis: ["./routes/*.js"],

@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  client:
+    image: "guillaumerce/oniverse-client:1.1"
+    ports:
+      - "3000:3000"
+    command: npm run start
+
+  server:
+    image: "guillaumerce/oniverse-server:1.1"
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3001:3001"
+    command: npm run start
+  
+  db:
+    image: mariadb
+    volumes:
+      - db:/var/lib/mysql
+      - ./mysql_config:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 8%sj9iAWtKL&c5ZyCQ78^9ET9LS8k27L
+    restart: always
+    ports:
+      - "3306:3306"
+
+volumes:
+    db:

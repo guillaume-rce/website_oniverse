@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import TooltipInfo from "../TooltipInfo";
 
 const DeliveryMethod = ({ deliveryMethod, deleteDeliveryMethod }) => {
     const [available, setAvailable] = useState(deliveryMethod.available);

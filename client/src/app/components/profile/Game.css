@@ -19,6 +19,11 @@
     /* this is the label in the game div */
     color: white;
     font-size: auto;
+
+    text-overflow: ellipsis;
+    word-break: break-word;
+    hyphens: auto;
+
 }
 
 .profile-game-titlebg {

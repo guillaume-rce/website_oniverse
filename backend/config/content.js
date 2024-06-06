@@ -1,16 +1,17 @@
 const mysql = require('mysql2');
 
 const content = mysql.createConnection({
-    host: 'localhost',
+    host: 'db',
     user: 'root',
-    password: 'root',
+    port: 3306,
+    password: '8%sj9iAWtKL&c5ZyCQ78^9ET9LS8k27L',
     database: 'content',
 });
-
+console.log('content -- V1');
 content.connect((err) => {
     if (err) {
-        console.error('Error connecting to content database', err);
-        return;
+        console.log('Error connecting to content database. ', err);
+        throw new Error(err);
     }
     console.log('Connected to content database');
 });
