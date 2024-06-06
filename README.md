@@ -40,10 +40,10 @@ This project comes from a school project, the goal is to create a e-commerce web
 1. Clone the repository: `git clone https://github.com/guillaume-rce/website_oniverse.git`
 2. Install Docker: [Docker Installation Guide](https://docs.docker.com/get-docker/)
 3. Launch the website using Docker: `docker-compose up` from the project directory
-3. BIS. You may need to restart your computer if you have an error with Docker or restart manually containers with `docker-compose restart` or using the Docker Desktop interface
-4. Open your browser and go to `http://localhost:3000` to view the website
-5. Open your browser and go to `http://localhost:3001/api-docs` to view the Swagger documentation
-6. To stop the website, press `Ctrl+C` in the terminal and run `docker-compose down`
+4. You may need to restart your computer if you have an error with Docker or restart manually containers with `docker-compose restart` or using the Docker Desktop interface
+5. Open your browser and go to `http://localhost:3000` to view the website
+6. Open your browser and go to `http://localhost:3001/api-docs` to view the Swagger documentation
+7. To stop the website, press `Ctrl+C` in the terminal and run `docker-compose down`
 
 ## Usage
 - Navigate to the different pages using the navigation menu.
