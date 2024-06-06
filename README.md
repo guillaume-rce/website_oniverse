@@ -60,3 +60,4 @@ If you want to be an admin, you can use the following credentials:
 
 ## License
 This project is licensed under a personalized license. **Please refer to the [LICENSE](LICENSE.md) file before using any part of this project.**
+Don't hesitate to contact me if you have any questions, I'm really open to discuss about it.
