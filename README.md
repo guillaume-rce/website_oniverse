@@ -20,14 +20,14 @@ This project aims to create a website for Oniverse, a futuristic game developmen
 This project comes from a school project, the goal is to create a e-commerce website but I wanted to go further and create a website that could be used by a real company and learn more about the technologies used in the project.
 
 ## Features
-- Panier et Commande
-- Gestion des Commandes et du Stock
-- Utilisateur et Authentification
-- Recherche et Gestion des Articles
-- Navigation et Interface Utilisateur
-- Promotions et Offres Spéciales
-- Page 404 dynamique
-- Documentation SWAGGER
+- Shopping Cart and Order
+- Order and Stock Management
+- User and Authentication
+- Search and Manage Items
+- Navigation and User Interface
+- Promotions and Special Offers
+- Dynamic 404 page
+- SWAGGER documentation
 
 ## Technologies Used
 - HTML
@@ -40,6 +40,7 @@ This project comes from a school project, the goal is to create a e-commerce web
 1. Clone the repository: `git clone https://github.com/guillaume-rce/website_oniverse.git`
 2. Install Docker: [Docker Installation Guide](https://docs.docker.com/get-docker/)
 3. Launch the website using Docker: `docker-compose up` from the project directory
+3. BIS. You may need to restart your computer if you have an error with Docker or restart manually containers with `docker-compose restart` or using the Docker Desktop interface
 4. Open your browser and go to `http://localhost:3000` to view the website
 5. Open your browser and go to `http://localhost:3001/api-docs` to view the Swagger documentation
 6. To stop the website, press `Ctrl+C` in the terminal and run `docker-compose down`
